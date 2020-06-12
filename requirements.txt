@@ -1,0 +1,5 @@
+numpy>=1.18.1
+scipy>=1.4.1
+forex-python>=1.5
+yfinance>=0.1.54
+lxml>=4.5.1
