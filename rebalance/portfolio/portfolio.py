@@ -32,8 +32,9 @@ class Portfolio:
     @property
     def cash(self):
         """
-        Cash: Sets and gets the portfolio's dictionary of cash.
+        Cash: Portfolio's dictionary of cash.
         """
+        
         return self._cash
 
     @cash.setter
@@ -54,11 +55,11 @@ class Portfolio:
 
     def easy_add_cash(self, amounts, currencies):
         """
-        Easy way of adding cash from various currencies to portfolio.
+        An easy way of adding cash of various currencies to portfolio.
 
         Args:
             amounts (Sequence[float]): Amounts of cash from different curriencies.
-            currencies (Sequence[str]): Specifies curriency of each of the amounts. Must in the same order as ``amounts``.
+            currencies (Sequence[str]): Specifies curriency of each of the amounts. Must be  in the same order as ``amounts``.
 
         """
         assert len(amounts) == len(currencies), "`amounts` and `currencies` should be of the same length."
@@ -68,7 +69,7 @@ class Portfolio:
     @property
     def assets(self):
         """ 
-        Dict[str, Asset]: Returns dictionary of assets in portfolio. The keys of the dictionary are the tickers of the assets.
+        Dict[str, Asset]: Dictionary of assets in portfolio. The keys of the dictionary are the tickers of the assets.
 
         
         No setter allowed.
@@ -102,7 +103,7 @@ class Portfolio:
 
         Args:
             tickers (Sequence[str]): Ticker of assets in portfolio.
-            quantities (Sequence[float]): Quantities of respective assets in portfolio. Must in the same order as ``tickers``.
+            quantities (Sequence[float]): Quantities of respective assets in portfolio. Must be in the same order as ``tickers``.
         """
 
         assert len(tickers) == len(quantities), \
@@ -116,7 +117,7 @@ class Portfolio:
         Computes the portfolio's asset allocation.
 
 
-        Returns:
+        Returns: 
             Dict[str, Asset]: Asset allocation of the portfolio (in %). The keys of the dictionary are the tickers of the assets.
         """
         
@@ -134,7 +135,7 @@ class Portfolio:
     def rebalance(self, target_allocation):
 
         """
-            Rebalances the portfolio using the specified target allocation, the portfolio's current allocation
+            Rebalances the portfolio using the specified target allocation, the portfolio's current allocation,
             and the available cash.
 
             Args:
@@ -242,7 +243,7 @@ class Portfolio:
         
     def _buy_asset(self, ticker, quantity):
         """
-            Buys ``quantity`` amount of the specified asset.
+            Buys the specified amount of an asset.
 
             Args:
                 ticker (str): Ticker of asset to buy.

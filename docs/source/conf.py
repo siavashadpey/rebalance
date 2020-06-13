@@ -39,10 +39,15 @@ extensions = [
     "sphinx.ext.napoleon",
 ]
 
+apidoc_module_dir = '../rebalance'
+apidoc_output_dir = 'source'
+apidoc_excluded_paths = ['tests', 'main', 'setup.py']
+apidoc_separate_modules = True
+
 # Napoleon settings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
-napoleon_include_init_with_doc = False
+napoleon_include_init_with_doc = True
 napoleon_include_private_with_doc = True
 napoleon_include_special_with_doc = True
 napoleon_use_admonition_for_examples = False
@@ -52,7 +57,11 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = False
 
+
 todo_include_todos = False
+add_module_names = False
+
+autoclass_content = "both"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -60,7 +69,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ['setup.py', 'driver.py']
 
 autodoc_mock_imports = ['forex_python', 'yfinance', 'numpy', 'scipy', 'typing']
 autodoc_default_flags = ['members', 'private-members', 'special-members', 'inherited-members', 'show-inheritance']
@@ -74,6 +83,7 @@ html_theme_path = ["."]
 html_theme = "semantic_sphinx"
 html_theme_options = {
     "navbar_links": [
+    	("Home", master_doc),
         ("Documentation", "documentation"),
     #    ("Examples", "nb_examples/index"),
     #    ("Books + Videos", "learn"),

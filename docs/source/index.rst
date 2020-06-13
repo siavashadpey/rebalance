@@ -21,7 +21,7 @@ Welcome to rebalance's documentation!
 
 .. code-block:: bash
 
-    git clone <rep>
+    git clone https://github.com/siavashadpey/rebalance.git
 
 .. raw:: html
 
@@ -50,7 +50,6 @@ Welcome to rebalance's documentation!
 
         <h2 class="ui dividing header">Example</h2>
 
-                <div class="ui text container">
 
                     <h3 class="ui header">Make a driver file:</h3>
 
@@ -162,7 +161,7 @@ Welcome to rebalance's documentation!
 .. code-block:: python
 
     # rebalance
-    p.selling_allowed = False # Don't allow selling while rebalancing
+    p.selling_allowed = False # To allow or not to allow selling while rebalancing
     p.rebalance(target_asset_alloc)
 
 .. raw:: html
@@ -181,8 +180,5 @@ Welcome to rebalance's documentation!
 
 .. raw:: html
 
-            </div>
         </div>
-
-
 

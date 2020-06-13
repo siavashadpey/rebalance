@@ -1,5 +1,10 @@
-rebalance package
-=================
+rebalance
+=========
+
+.. automodule:: rebalance
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Subpackages
 -----------
@@ -10,12 +15,3 @@ Subpackages
    rebalance.assets
    rebalance.cash
    rebalance.portfolio
-   rebalance.tests
-
-Module contents
----------------
-
-.. automodule:: rebalance
-   :members:
-   :undoc-members:
-   :show-inheritance:
