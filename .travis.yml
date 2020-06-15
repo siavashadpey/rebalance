@@ -1,3 +1,12 @@
-language: python
+language: 
+  python
 
-script: ./run_all_tests.sh
+branches:
+  only:
+    - master
+    - dev
+    
+script: 
+  ./run_all_tests.sh
+
+after_success: 
