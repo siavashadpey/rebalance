@@ -64,7 +64,7 @@ class TestPortfolio(unittest.TestCase):
         for i in range(len(tickers)):
             self.assertEqual(tickers[i], p.assets[tickers[i]].ticker)
             self.assertEqual(quantities[i], p.assets[tickers[i]].quantity)
-            self.assertEqual(yf.Ticker(tickers[i]).info["regularMarketOpen"], p.assets[tickers[i]].price)
+            self.assertEqual(yf.Ticker(tickers[i]).info["ask"], p.assets[tickers[i]].price)
 
     def test_asset_allocation(self):
         p = Portfolio()
@@ -79,7 +79,7 @@ class TestPortfolio(unittest.TestCase):
 
         rates = CurrencyRates()
 
-        prices = [yf.Ticker(ticker).info["regularMarketOpen"]*rates.get_rate(yf.Ticker(ticker).info["currency"], "CAD") for ticker in tickers]
+        prices = [yf.Ticker(ticker).info["ask"]*rates.get_rate(yf.Ticker(ticker).info["currency"], "CAD") for ticker in tickers]
         total = np.sum(np.asarray(quantities)*np.asarray(prices))
         for i in range(len(tickers)):
             self.assertAlmostEqual(asset_alloc[tickers[i]], quantities[i]*prices[i]/total*100.)

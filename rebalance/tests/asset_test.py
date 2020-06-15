@@ -10,7 +10,7 @@ class TestAsset(unittest.TestCase):
         ticker = "VCN.TO"
         quantity = 2
         ticker_info = yf.Ticker(ticker).info
-        price = ticker_info["regularMarketOpen"]
+        price = ticker_info["ask"]
         asset = Asset(ticker, quantity)
         self.assertEqual(asset.quantity, quantity)
         self.assertEqual(asset.price, price)

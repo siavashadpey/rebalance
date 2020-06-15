@@ -98,61 +98,25 @@ Welcome to rebalance's documentation!
 
     # Assets in portfolio
     # The price will be retrieved automatically
-    tickers = ["VCN.TO", "ZAG.TO", "XAW.TO"]
-    quantities = [5, 20, 12]
+    tickers = ["XBB.TO", "XIC.TO", "ITOT", "IEFA", "IEMG"]
+    quantities = [36, 64, 32, 8, 7]
     p.easy_add_assets(tickers=tickers, quantities=quantities)
 
 
 .. raw:: html
 
-                    <h3 class="ui header">We can check our current asset allocation:</h3>
-
-.. code-block:: python
-
-    # Current asset allocation (in %)
-    asset_alloc = p.asset_allocation()
-    print(asset_alloc)
-
-.. raw:: html
-
-                    <p>You should see something similar to this (the actual values might differ due to price changes).</p>
-
-.. code-block:: bash
-
-    {'VCN.TO': 19.268951399080024,
-     'ZAG.TO': 40.96733219055606,
-     'XAW.TO': 39.76371641036392}
-
-.. raw:: html
-
-                    <h3 class="ui header">We can also check other things such as the price and the market value of any asset:</h3>
-
-.. code-block:: python
-
-    print("The price of XAW.TO is " + str(p.assets["XAW.TO"].price) + " " + p.assets["XAW.TO"].currency)
-    print("My holdings of XAW.TO are valued at " + str(p.assets["XAW.TO"].market_value()) + " " + p.assets["XAW.TO"].currency)
-
-
-.. raw:: html
-
-                    <p>You should see something similar to this (the actual values might differ due to price changes).</p>
-
-.. code-block:: bash
-
-    The price of XAW.TO is 26.87 CAD
-    My holdings of XAW.TO are valued at 322.44 CAD
-
-.. raw:: html
-
-                    <h3 class="ui header">Once we're done investigating, we need to specify our target asset allocation.</h3>
+                    <h3 class="ui header">Before rebalancing, we need to specify our target asset allocation.</h3>
 
 .. code-block:: python
 
     # Target asset allocation (in %)
     target_asset_alloc = {
-    "VCN.TO": 40.0,
-    "ZAG.TO": 40.0,
-    "XAW.TO": 20.0}
+    "XBB.TO": 20,
+    "XIC.TO": 20,
+    "ITOT":   36,
+    "IEFA":   20,
+    "IEMG":    4
+    }
 
 .. raw:: html
 
@@ -162,20 +126,27 @@ Welcome to rebalance's documentation!
 
     # rebalance
     p.selling_allowed = False # To allow or not to allow selling while rebalancing
-    p.rebalance(target_asset_alloc)
+    p.rebalance(target_asset_alloc, verbose=True)
 
 .. raw:: html
 
-                    <p>You should see something similar to this (the actual values might differ due to price changes).</p>
+                    <p>You should see something similar to this (the actual values might differ due to changes in prices and exchange rates).</p>
 
 .. code-block:: bash
 
-    Ticker     Quantity   Amount   Currency   Old allocation   New allocation   Target allocation
-                to buy      ($)                    (%)              (%)                (%)
-    ----------------------------------------------------------------------------------------------
-    VCN.TO       15        468.75    CAD            19               40                 40
-    ZAG.TO       17        282.37    CAD            41               39                 40
-    XAW.TO        0          0.00    CAD            40               21                 20
+     Ticker    Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation
+                        to buy         ($)                      (%)              (%)                 (%)
+    -------------------------------------------------------------------------------------------------------------
+      XBB.TO  33.43       29          969.47      CAD          17.89            19.97                20.00
+      XIC.TO  24.16       27          652.32      CAD          22.99            20.21                20.00
+        ITOT  67.35       11          740.85      USD          43.51            36.14                36.00
+        IEFA  56.19       20         1123.80      USD           9.07            19.63                20.00
+        IEMG  46.23        0            0.00      USD           6.53             4.04                 4.00
+    
+    Remaining cash: 119.63 CAD.
+    Largest discrepancy between the new and the target asset allocation is 0.37 %.
+    
+    The exchange rate from USD to CAD is 1.3577.
 
 
 .. raw:: html

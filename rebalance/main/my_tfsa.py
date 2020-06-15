@@ -4,23 +4,21 @@ from rebalance import Portfolio, Asset, Cash
 p = Portfolio()
 
 # Cash in portfolio
-cash_amounts = [200., 3000.]
-cash_currency = ["CAD", "USD"]
+cash_amounts = [500.]
+cash_currency = ["CAD"]
 p.easy_add_cash(amounts=cash_amounts, currencies=cash_currency)
 
 # Assets in portfolio
 # The price will be retrieved automatically
-tickers = ["XBB.TO", "XIC.TO", "ITOT", "IEFA", "IEMG"]
-quantities = [36, 64, 32, 8, 7]
+tickers = ["VCN.TO", "XAW.TO", "ZAG.TO"]
+quantities = [5, 12, 20]
 p.easy_add_assets(tickers=tickers, quantities=quantities)
 
 # Target asset allocation (in %)
 target_asset_alloc = {
-"XBB.TO": 20,
-"XIC.TO": 20,
-"ITOT":   36,
-"IEFA":   20,
-"IEMG":    4
+"VCN.TO": 40.0
+"ZAG.TO": 40.0,
+"XAW.TO": 20.0,
 }
 
 # rebalance

@@ -10,8 +10,6 @@ from rebalance import Asset
 from rebalance import Cash
 from rebalance import Price
 
-#TODO: documentation
-
 class Portfolio:
     """
     Portfolio class.
@@ -50,8 +48,10 @@ class Portfolio:
             currency (str) : Currency of cash
         """
 
-        # TODO: if existing currency, add amount to existing amount
-        self._cash[currency.upper()] = Cash(amount, currency)
+        if currency.upper() not in self._cash.keys():
+            self._cash[currency.upper()] = Cash(amount, currency)
+        else:
+            self._cash[currency.upper()].amount += amount
 
     def easy_add_cash(self, amounts, currencies):
         """
@@ -126,13 +126,15 @@ class Portfolio:
         for asset in self._assets.values():
             total_value += asset.market_value_in(Portfolio._common_currency)
 
+        total_value = max(1., total_value) # protect against division by 0 (total_value = 0, means new portfolio)
+        
         asset_allocation = {}
         for name, asset in self._assets.items():
             asset_allocation[name] = asset.market_value_in(Portfolio._common_currency)/total_value*100.
 
         return asset_allocation
 
-    def rebalance(self, target_allocation):
+    def rebalance(self, target_allocation, verbose=False):
 
         """
             Rebalances the portfolio using the specified target allocation, the portfolio's current allocation,
@@ -140,10 +142,26 @@ class Portfolio:
 
             Args:
                 target_allocation (Dict[str, float]): Target asset allocation of the portfolio (in %). The keys of the dictionary are the tickers of the assets.
+                verbose (bool, optional): Verbosity flag. Default is False. 
+
+            Returns:
+                (tuple): tuple containing:
+                    * new_units (Dict[str, int]): Units of each asset to buy. The keys of the dictionary are the tickers of the assets.
+                    * prices (Dict[str, [float, str]]): The keys of the dictionary are the tickers of the assets. Each value of the dictionary is a 2-entry list. The first entry is the price of the asset during the rebalancing computation. The second entry is the currency of the asset.
+                    * exchange_rates (Dict[str, float]): The keys of the dictionary are currencies. Each value is the exchange rate to CAD during the rebalancing computation.
+                    * max_diff (float): Largest difference between target allocation and optimized asset allocation.
         """
 
-        # TODO: order target_allocation dict in the same order as assets dict
-        target_allocation_np = np.fromiter(target_allocation.values(), dtype=float)
+        # order target_allocation dict in the same order as assets dict and upper key
+        target_allocation_reordered = {}
+        try:
+            for key in self._assets.keys():
+                target_allocation_reordered[key] = target_allocation[key]
+        except:
+            raise Exception("'target_allocation not compatible with the assets of the portfolio.")
+
+
+        target_allocation_np = np.fromiter(target_allocation_reordered.values(), dtype=float)
 
         assert abs(np.sum(target_allocation_np)-100.) <= 1E-2, "target allocation must sum up to 100%."
 
@@ -172,34 +190,60 @@ class Portfolio:
         solution = minimize(balanced_portfolio._rebalance_objective_function, new_asset_values0, args=(current_asset_values, target_allocation_np), method='SLSQP', bounds=bounds, constraints=constraints)
 
         # Buy assets based on optimization solution
-        quantities_to_buy = np.zeros_like(solution.x)
+        quantities_to_buy = np.zeros_like(solution.x).astype(int)
         investment_amount = np.zeros_like(solution.x)
+        new_units = {}
+        prices = {}
         for i, ticker in zip(range(nb_assets), balanced_portfolio.assets.keys()):
             quantities_to_buy[i] = math.floor(solution.x[i]/balanced_portfolio.assets[ticker].price_in(Portfolio._common_currency))
             balanced_portfolio._buy_asset(ticker, quantities_to_buy[i])
+            prices[ticker] = [balanced_portfolio.assets[ticker].price, balanced_portfolio.assets[ticker].currency] 
             if self._is_selling_allowed:
                 quantities_to_buy[i] -= self._assets[ticker].quantity
+            new_units[ticker] = quantities_to_buy[i]
             investment_amount[i] = quantities_to_buy[i]*balanced_portfolio.assets[ticker].price
-
-
-        # TODO: Compute total cash needed per currency
-
-        # TODO: Compute currency exchanges needed and output this (if any)
 
         old_asset_allocation = self.asset_allocation()
         new_asset_allocation = balanced_portfolio.asset_allocation()
 
-        # Print shares to buy, cost, new allocation, old allocation target, and target allocation
-        print(" Ticker     Quantity   Amount   Currency   Old allocation   New allocation   Target allocation")
-        print("            to buy      ($)                    (%)              (%)                (%)")
-        print("----------------------------------------------------------------------------------------------")
-        for i, ticker in zip(range(nb_assets), balanced_portfolio.assets.keys()):
-            print("%s      %3.d        %6.2f    %s            %2.f               %2.f                 %2.f" % (ticker, quantities_to_buy[i], investment_amount[i], balanced_portfolio.assets[ticker].currency, old_asset_allocation[ticker], new_asset_allocation[ticker], target_allocation[ticker]))
+        max_diff = max(abs(target_allocation_np - np.fromiter(new_asset_allocation.values(), dtype=float)))
 
-        # TODO: Print remaining cash
+        # obtain all the conversion rates used in computation
+        exchange_rates = {}
+        for curr in self.cash.keys():
+            if curr != Portfolio._common_currency:
+                exchange_rates[curr] = 1./balanced_portfolio.cash[Portfolio._common_currency].exchange_rate(curr)
+
+        for asset in self.assets.values():
+            curr = asset.currency
+            if curr not in exchange_rates.keys() and curr != Portfolio._common_currency:
+                exchange_rates[curr] = 1./balanced_portfolio.cash[Portfolio._common_currency].exchange_rate(curr)
+
+
+        if verbose:
+            # Print shares to buy, cost, new allocation, old allocation target, and target allocation
+            print(" Ticker    Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation")
+            print("                    to buy         ($)                      (%)              (%)                 (%)"         )
+            print("-------------------------------------------------------------------------------------------------------------")
+            for i, ticker in zip(range(nb_assets), balanced_portfolio.assets.keys()):
+                print("%8s  %3.2f   %6.d        %8.2f     %4s          %5.2f            %5.2f                %5.2f" % \
+                (ticker, prices[ticker][0], quantities_to_buy[i], investment_amount[i], prices[ticker][1], old_asset_allocation[ticker], new_asset_allocation[ticker], target_allocation[ticker]))
+        
+            # Print remaining cash
+            print("")
+            print("Remaining cash: %.2f %s." % (balanced_portfolio.cash[Portfolio._common_currency].amount, Portfolio._common_currency))
+
+            print("Largest discrepancy between the new and the target asset allocation is %.2f %%." % (max_diff))
+
+            # Print exchange rates
+            print("")
+            for curr, rate in exchange_rates.items():
+                print("The exchange rate from %s to %s is %.4f." % (curr, Portfolio._common_currency, rate))
 
         # Now that we're done, we can replace old portfolio with the new one
-        self = balanced_portfolio 
+        self.__dict__.update(balanced_portfolio.__dict__)
+
+        return (new_units, prices, exchange_rates, max_diff)
 
     def _rebalance_objective_function(self, new_asset_values, current_asset_values, target_allocation):
 
@@ -235,7 +279,7 @@ class Portfolio:
         """
 
         if Portfolio._common_currency not in self._cash.keys():
-            self._cash[Portfolio._common_currency] = 0.00
+            self._cash[Portfolio._common_currency] = Cash(0.00,Portfolio._common_currency)
 
         for asset in self._assets.values():
             self._cash[Portfolio._common_currency].amount += asset.market_value_in(Portfolio._common_currency)
@@ -249,7 +293,5 @@ class Portfolio:
                 ticker (str): Ticker of asset to buy.
                 quantity (int): Quantity to buy.
         """
-
-        # TODO: first, attempt to buy using cash in asset's currency, then try other cash
         cost = self._assets[ticker].buy(quantity, currency=Portfolio._common_currency)
         self._cash[Portfolio._common_currency].amount -= cost

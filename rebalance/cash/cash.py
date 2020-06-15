@@ -1,8 +1,6 @@
 
 from forex_python.converter import CurrencyRates
 
-#TODO: documentation 
-
 class Cash:
     """
     An instance of :class:`Cash` holds an amount and a currency.
@@ -19,7 +17,7 @@ class Cash:
 
         Args:
             amount (float, optional): Amount of cash.
-            currency (str, optional): Currency of cash. Defaults to "CAD" .
+            currency (str, optional): Currency of cash. Defaults to "CAD".
         """
         if amount is None:
             print("`amount` argument must be specified.")
@@ -58,6 +56,17 @@ class Cash:
             (float): Amount of cash in specified currency.
         """
 
-        currency_exchange = Cash.currency_rates.get_rate(self.currency, currency.upper())
+        return self.exchange_rate(currency)*self._amount
 
-        return currency_exchange*self._amount
+    def exchange_rate(self, currency):
+        """
+        Obtain the exchange rate from ``cash``'s own currency to specified currency.
+
+        Args:
+            currency (str): Currency.
+
+        Returns:
+            (float): exchange rate.
+        """
+
+        return Cash.currency_rates.get_rate(self.currency, currency.upper())

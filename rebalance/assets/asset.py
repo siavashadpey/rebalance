@@ -3,8 +3,6 @@ from rebalance import Price
 
 import yfinance as yf
 
-#TODO: documentation
-
 class Asset:
     """
     Asset class.
@@ -12,13 +10,13 @@ class Asset:
     Holds the name, number of units, and the :class:`.Price` of the asset.
 
     """
-    def __init__(self, ticker, quantity):
+    def __init__(self, ticker, quantity=0):
         """
         Initialization.
 
         Args:
             ticker (str): Ticker of the asset.
-            quantity (int): Number of units of the asset.
+            quantity (int, optional): Number of units of the asset. Default is zero.
         """
 
         assert ticker is not None, "ticker symbol is a mandatory argument."
@@ -27,7 +25,9 @@ class Asset:
         self._ticker = ticker
         self._quantity = quantity
         ticker_info = yf.Ticker(self._ticker).info
-        self._price = Price(ticker_info["regularMarketOpen"], ticker_info["currency"])
+        
+        # we set the price to ask
+        self._price = Price(ticker_info["ask"], ticker_info["currency"])
     
     def market_value(self):
         """
@@ -107,6 +107,22 @@ class Asset:
         (str): Ticker of the asset.
         """
         return self._ticker
+
+    def cost_of(self, units, currency=None):
+        """
+        Computes the cost to purchase the specified number of units.
+
+        Args:
+            units (int): Units interested in purchasing.
+            currency (str, optional): Currency in which to convert the cost. Default is asset's own currency.
+
+        Returns:
+            (float): Cost of the purchase.
+        """
+        if currency is None:
+            return self.price*units
+        else:
+            return self.price_in(currency)*units
 
     def __str__(self):
         return yf.Ticker(self._ticker).info['shortName'] + "(" + self._ticker + ")" 
