@@ -37,7 +37,7 @@ class TestPortfolio(unittest.TestCase):
         ticker = "VCN.TO"
         quantity = 2
         ticker_info = yf.Ticker(ticker).info
-        price = ticker_info["regularMarketOpen"]
+        price = ticker_info["ask"]
         asset = Asset(ticker=ticker, quantity = quantity)
 
         p.add_asset(asset)
@@ -82,7 +82,7 @@ class TestPortfolio(unittest.TestCase):
         prices = [yf.Ticker(ticker).info["ask"]*rates.get_rate(yf.Ticker(ticker).info["currency"], "CAD") for ticker in tickers]
         total = np.sum(np.asarray(quantities)*np.asarray(prices))
         for i in range(len(tickers)):
-            self.assertAlmostEqual(asset_alloc[tickers[i]], quantities[i]*prices[i]/total*100.)
+            self.assertAlmostEqual(asset_alloc[tickers[i]], quantities[i]*prices[i]/total*100., 1)
 
     def test_rebalancing(self):
         p = Portfolio()
