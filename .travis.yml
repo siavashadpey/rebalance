@@ -22,7 +22,8 @@ after_success:
 
 stages:
   - Testing
-  - Upstream
+  - name: Upstream
+    if: branch = master
 
 
 jobs:
