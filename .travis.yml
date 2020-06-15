@@ -1,6 +1,7 @@
 language: 
   python
 
+# only invoke travis-ci for certain branches
 branches:
   only:
     - master
