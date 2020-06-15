@@ -23,7 +23,7 @@ after_success:
 stages:
   - Testing
   - Upstream
-    if: branch = dev
+
 
 jobs:
   include:
