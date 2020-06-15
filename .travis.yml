@@ -8,12 +8,34 @@ branches:
     - master
     - dev
 
-before_script:
-  pip install coverage==4.5.4
-  pip install python-coveralls
+#before_script:
+#  pip install coverage==4.5.4
+#  pip install python-coveralls
 
-script: 
-  ./travis_run.sh
+#script: 
+  skip
+#  ./travis_run.sh
 
-after_success: 
-  coveralls
+#after_success: 
+#  coveralls
+
+stages:
+  Testing
+#  Deploy
+
+jobs:
+  include:
+    - name: Unit testing
+      stage: Testing
+      install: 
+        pip install coverage==4.5.4
+        pip install python-coveralls
+      script: ./travis_run.sh
+      after_success:
+        coveralls
+   # - name: Deploy
+   #   if: (branch = master) AND (NOT (type IN (pull_request)))
+   #   stage: Deploy
+   #   install: pass
+   #   script:
+   #   after_success: pass

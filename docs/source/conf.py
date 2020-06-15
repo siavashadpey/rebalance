@@ -85,6 +85,7 @@ html_theme_options = {
     "navbar_links": [
     	("Home", master_doc),
         ("Documentation", "documentation"),
+        ("Contact", "contact")
     #    ("Examples", "nb_examples/index"),
     #    ("Books + Videos", "learn"),
     #    ("API", "api"),
