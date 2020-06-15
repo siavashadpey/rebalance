@@ -9,12 +9,40 @@ branches:
     - dev
 
 before_script:
-  pip install coverage==4.5.4
-  pip install python-coveralls
+  - skip
+  #pip install coverage==4.5.4
+  #pip install python-coveralls
 
 script: 
-  ./travis_run.sh
+  #./travis_run.sh
 
 after_success: 
-  coveralls
+  - skip
+  #coveralls
 
+stages:
+  - Testing
+  - Upstream
+    if: branch = dev
+#  Deploy
+
+jobs:
+  include:
+    - name: Testing
+      stage: Testing
+      install: 
+        - pip install coverage==4.5.4
+        - pip install python-coveralls
+      script: 
+        - ./travis_run.sh
+      after_success:
+        - coveralls
+    - name: 
+        - Upstream
+      stage: 
+        - Upstream
+      install: 
+        - skip
+      script: echo "hello"
+      after_success:
+        - skip
