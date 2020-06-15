@@ -18,7 +18,6 @@ class Portfolio:
 
     """
 
-    _common_currency = "CAD"
     def __init__(self):
         """
         Initialization.
@@ -26,6 +25,7 @@ class Portfolio:
         self._assets = {}
         self._cash = {}
         self._is_selling_allowed = False
+        self._common_currency = "CAD"
 
     @property
     def cash(self):
@@ -124,13 +124,13 @@ class Portfolio:
         # Obtain all market values in 1 currency (doesn't matter which) 
         total_value = 0.
         for asset in self._assets.values():
-            total_value += asset.market_value_in(Portfolio._common_currency)
+            total_value += asset.market_value_in(self._common_currency)
 
         total_value = max(1., total_value) # protect against division by 0 (total_value = 0, means new portfolio)
         
         asset_allocation = {}
         for name, asset in self._assets.items():
-            asset_allocation[name] = asset.market_value_in(Portfolio._common_currency)/total_value*100.
+            asset_allocation[name] = asset.market_value_in(self._common_currency)/total_value*100.
 
         return asset_allocation
 
@@ -165,10 +165,16 @@ class Portfolio:
 
         assert abs(np.sum(target_allocation_np)-100.) <= 1E-2, "target allocation must sum up to 100%."
 
+
+        # Set common currency
+        self._common_currency = next(iter(self._cash)) # first currency in cash dict
+
         # Make a new instance of portfolio
         # This is the one that is going to be rebalanced
         # We do not modify the current portfolio
         balanced_portfolio = copy.deepcopy(self)
+
+
 
         # If sell is  allowed, "sell everything" in new portfolio
         if self._is_selling_allowed:
@@ -177,16 +183,16 @@ class Portfolio:
         # Convert all cash to one currency
         total_cash = 0.
         for cash in balanced_portfolio.cash.values():
-            total_cash += cash.amount_in(Portfolio._common_currency)
-        balanced_portfolio.cash = {Portfolio._common_currency: Cash(total_cash, balanced_portfolio._common_currency)}
+            total_cash += cash.amount_in(self._common_currency)
+        balanced_portfolio.cash = {self._common_currency: Cash(total_cash, balanced_portfolio._common_currency)}
 
         # Solve optimization problem
         nb_assets = len(balanced_portfolio._assets)
         bound = (0.00, total_cash)
         bounds = ((bound,)*nb_assets)
-        constraints = [{'type': 'ineq', 'fun': lambda new_asset_values: balanced_portfolio.cash[Portfolio._common_currency].amount - np.sum(new_asset_values)}] # Can't buy more than available cash
+        constraints = [{'type': 'ineq', 'fun': lambda new_asset_values: balanced_portfolio.cash[self._common_currency].amount - np.sum(new_asset_values)}] # Can't buy more than available cash
         new_asset_values0 = np.ones(nb_assets)
-        current_asset_values = np.array([asset.market_value_in(Portfolio._common_currency) for asset in balanced_portfolio.assets.values()])
+        current_asset_values = np.array([asset.market_value_in(self._common_currency) for asset in balanced_portfolio.assets.values()])
         solution = minimize(balanced_portfolio._rebalance_objective_function, new_asset_values0, args=(current_asset_values, target_allocation_np), method='SLSQP', bounds=bounds, constraints=constraints)
 
         # Buy assets based on optimization solution
@@ -195,7 +201,7 @@ class Portfolio:
         new_units = {}
         prices = {}
         for i, ticker in zip(range(nb_assets), balanced_portfolio.assets.keys()):
-            quantities_to_buy[i] = math.floor(solution.x[i]/balanced_portfolio.assets[ticker].price_in(Portfolio._common_currency))
+            quantities_to_buy[i] = math.floor(solution.x[i]/balanced_portfolio.assets[ticker].price_in(self._common_currency))
             balanced_portfolio._buy_asset(ticker, quantities_to_buy[i])
             prices[ticker] = [balanced_portfolio.assets[ticker].price, balanced_portfolio.assets[ticker].currency] 
             if self._is_selling_allowed:
@@ -211,13 +217,13 @@ class Portfolio:
         # obtain all the conversion rates used in computation
         exchange_rates = {}
         for curr in self.cash.keys():
-            if curr != Portfolio._common_currency:
-                exchange_rates[curr] = 1./balanced_portfolio.cash[Portfolio._common_currency].exchange_rate(curr)
+            if curr != self._common_currency:
+                exchange_rates[curr] = 1./balanced_portfolio.cash[self._common_currency].exchange_rate(curr)
 
         for asset in self.assets.values():
             curr = asset.currency
-            if curr not in exchange_rates.keys() and curr != Portfolio._common_currency:
-                exchange_rates[curr] = 1./balanced_portfolio.cash[Portfolio._common_currency].exchange_rate(curr)
+            if curr not in exchange_rates.keys() and curr != self._common_currency:
+                exchange_rates[curr] = 1./balanced_portfolio.cash[self._common_currency].exchange_rate(curr)
 
 
         if verbose:
@@ -231,14 +237,14 @@ class Portfolio:
         
             # Print remaining cash
             print("")
-            print("Remaining cash: %.2f %s." % (balanced_portfolio.cash[Portfolio._common_currency].amount, Portfolio._common_currency))
+            print("Remaining cash: %.2f %s." % (balanced_portfolio.cash[self._common_currency].amount, self._common_currency))
 
             print("Largest discrepancy between the new and the target asset allocation is %.2f %%." % (max_diff))
 
             # Print exchange rates
             print("")
             for curr, rate in exchange_rates.items():
-                print("The exchange rate from %s to %s is %.4f." % (curr, Portfolio._common_currency, rate))
+                print("The exchange rate from %s to %s is %.4f." % (curr, self._common_currency, rate))
 
         # Now that we're done, we can replace old portfolio with the new one
         self.__dict__.update(balanced_portfolio.__dict__)
@@ -267,7 +273,7 @@ class Portfolio:
         j1 = np.inner(asset_alloc_diff, asset_alloc_diff)
 
         # Penalize unused cash (we use L2 norm)
-        cash_diff = self._cash[Portfolio._common_currency].amount - np.sum(new_asset_values)
+        cash_diff = self._cash[self._common_currency].amount - np.sum(new_asset_values)
         j2 = 50.*np.inner(cash_diff, cash_diff)
 
         return j1 + j2
@@ -278,11 +284,11 @@ class Portfolio:
             Sells all assets in the portfolio and converts them to cash. 
         """
 
-        if Portfolio._common_currency not in self._cash.keys():
-            self._cash[Portfolio._common_currency] = Cash(0.00,Portfolio._common_currency)
+        if self._common_currency not in self._cash.keys():
+            self._cash[self._common_currency] = Cash(0.00,self._common_currency)
 
         for asset in self._assets.values():
-            self._cash[Portfolio._common_currency].amount += asset.market_value_in(Portfolio._common_currency)
+            self._cash[self._common_currency].amount += asset.market_value_in(self._common_currency)
             asset.quantity = 0
         
     def _buy_asset(self, ticker, quantity):
@@ -293,5 +299,5 @@ class Portfolio:
                 ticker (str): Ticker of asset to buy.
                 quantity (int): Quantity to buy.
         """
-        cost = self._assets[ticker].buy(quantity, currency=Portfolio._common_currency)
-        self._cash[Portfolio._common_currency].amount -= cost
+        cost = self._assets[ticker].buy(quantity, currency=self._common_currency)
+        self._cash[self._common_currency].amount -= cost

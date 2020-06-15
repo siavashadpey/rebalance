@@ -4,8 +4,8 @@ from rebalance import Portfolio, Asset, Cash
 p = Portfolio()
 
 # Cash in portfolio
-cash_amounts = [200., 3000.]
-cash_currency = ["CAD", "USD"]
+cash_amounts = [3000., 200.]
+cash_currency = ["USD", "CAD"]
 p.easy_add_cash(amounts=cash_amounts, currencies=cash_currency)
 
 # Assets in portfolio
