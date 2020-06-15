@@ -1,0 +1,6 @@
+[run]:
+source = 
+	rebalance/
+omit = 
+	rebalance/tests/*.py
+	rebalance/main/*.py
