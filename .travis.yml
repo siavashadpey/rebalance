@@ -11,3 +11,4 @@ script:
   ./run_all_tests.sh
 
 after_success: 
+  coveralls
