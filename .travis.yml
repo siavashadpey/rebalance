@@ -13,8 +13,7 @@ branches:
 #  pip install python-coveralls
 
 script: 
-  skip
-#  ./travis_run.sh
+  ./travis_run.sh
 
 #after_success: 
 #  coveralls
