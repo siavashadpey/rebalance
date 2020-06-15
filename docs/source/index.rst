@@ -8,6 +8,8 @@
 Welcome to rebalance's documentation!
 =====================================
 
+.. include:: ../../README.rst
+
 .. raw:: html
 
         <div class="ui container">
