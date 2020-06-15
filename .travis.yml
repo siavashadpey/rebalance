@@ -1,12 +1,17 @@
-language: 
-  python
+language: python
+
+cache: pip
 
 # only invoke travis-ci for certain branches
 branches:
   only:
     - master
     - dev
-    
+
+before_script:
+  pip install coverage==4.5.4
+  pip install python-coveralls
+  
 script: 
   ./travis_run.sh
 
