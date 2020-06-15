@@ -40,4 +40,5 @@ if __name__ == "__main__":
           packages=find_packages(),
           python_requires=">=3.6",
           tests_require=test_reqs,
+          url="https://rebalance.readthedocs.io/",
           install_requires=install_reqs)

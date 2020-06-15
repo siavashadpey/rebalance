@@ -20,7 +20,9 @@ branches:
 #  coveralls
 
 stages:
-  Testing
+  - Testing
+  - Upstream
+    if: branch = dev
 #  Deploy
 
 jobs:
@@ -33,9 +35,8 @@ jobs:
       script: ./travis_run.sh
       after_success:
         coveralls
-   # - name: Deploy
-   #   if: (branch = master) AND (NOT (type IN (pull_request)))
-   #   stage: Deploy
-   #   install: pass
-   #   script:
-   #   after_success: pass
+    - name: Upstream
+      stage: Upstream
+      install: pass
+      script: echo "hello"
+      after_success: pass
