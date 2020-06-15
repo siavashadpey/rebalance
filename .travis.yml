@@ -17,12 +17,3 @@ script:
 
 after_success: 
   coveralls
-
-
-deploy:
-  provider: pages
-  skip_cleanup: true
-  keep_history: true
-  target_branch: master        # Push into GitHub repo master branch
-  on:
-    branch: dev
