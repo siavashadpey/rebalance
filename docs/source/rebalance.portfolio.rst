@@ -1,22 +1,19 @@
-rebalance.portfolio package
-===========================
+rebalance.portfolio
+===================
+
+.. automodule:: rebalance.portfolio
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
 
-rebalance.portfolio.portfolio module
-------------------------------------
+rebalance.portfolio.portfolio
+-----------------------------
 
 .. automodule:: rebalance.portfolio.portfolio
    :members:
    :undoc-members:
    :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: rebalance.portfolio
-   :members:
-   :undoc-members:
-   :show-inheritance:
