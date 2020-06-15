@@ -1,6 +1,5 @@
 language: python
 
-cache: pip
 
 # only invoke travis-ci for certain branches
 branches:
@@ -14,7 +13,7 @@ before_script:
   #pip install python-coveralls
 
 script:
-  - Skip 
+  - Skip
   #./travis_run.sh
 
 after_success: 
@@ -23,8 +22,8 @@ after_success:
 
 stages:
   - Testing
-
-#  Deploy
+  - Upstream
+    if: branch = dev
 
 jobs:
   include:
