@@ -28,27 +28,6 @@ class Asset:
         
         # we set the price to ask
         self._price = Price(ticker_info["ask"], ticker_info["currency"])
-    
-    def market_value(self):
-        """
-        Computes the market value of the asset. 
-
-        Returns:
-            float: Market value of the asset (in asset's own currency).
-        """
-        return self.price*self._quantity
-
-    def market_value_in(self, currency):
-        """
-        Computes the market value of the asset in specified currency. 
-
-        Args:
-            currency (str): Currency in which to obtain market value.
-
-        Returns:
-            float: Market value of the asset.
-        """
-        return self._price.price_in(currency)*self._quantity
 
     @property
     def quantity(self):
@@ -59,24 +38,6 @@ class Asset:
     def quantity(self, quantity):
         assert isinstance(quantity, int), "quantity must be integer." 
         self._quantity = quantity
-
-    def buy(self, quantity, currency=None):
-        """
-            Buys a specified amount of the asset.
-
-            Args:
-                quantity (int): Quantity to buy.
-                currency (str, optional): Currency in which to obtain cost. Defaults to asset's own currency.
-
-            Returns:
-                (float): Cost of the units bought in specified ``currency``.
-        """
-        self._quantity += quantity
-        if currency is None:
-            return self._price.price*quantity
-        else:
-            return self._price.price_in(currency)*quantity
-
     
     @property
     def price(self):
@@ -107,6 +68,44 @@ class Asset:
         (str): Ticker of the asset.
         """
         return self._ticker
+
+    def market_value(self):
+        """
+        Computes the market value of the asset. 
+
+        Returns:
+            float: Market value of the asset (in asset's own currency).
+        """
+        return self.price*self._quantity
+
+    def market_value_in(self, currency):
+        """
+        Computes the market value of the asset in specified currency. 
+
+        Args:
+            currency (str): Currency in which to obtain market value.
+
+        Returns:
+            float: Market value of the asset.
+        """
+        return self._price.price_in(currency)*self._quantity
+
+    def buy(self, quantity, currency=None):
+        """
+            Buys a specified amount of the asset.
+
+            Args:
+                quantity (int): Quantity to buy.
+                currency (str, optional): Currency in which to obtain cost. Defaults to asset's own currency.
+
+            Returns:
+                (float): Cost of the units bought in specified ``currency``.
+        """
+        self._quantity += quantity
+        if currency is None:
+            return self._price.price*quantity
+        else:
+            return self._price.price_in(currency)*quantity
 
     def cost_of(self, units, currency=None):
         """

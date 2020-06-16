@@ -9,16 +9,12 @@ branches:
 
 before_script:
   - skip
-  #pip install coverage==4.5.4
-  #pip install python-coveralls
 
 script:
   - Skip
-  #./travis_run.sh
 
 after_success: 
   - skip
-  #coveralls
 
 stages:
   - Testing
@@ -34,7 +30,7 @@ jobs:
         - pip install coverage==4.5.4
         - pip install python-coveralls
       script: 
-        - ./travis_run.sh
+        - make coverage
       after_success:
         - coveralls
     - name: 
@@ -43,7 +39,7 @@ jobs:
         - Upstream
       install: 
         - skip
-      script: echo "hello" # TODO: replace this by a script which pushes from dev to master
+      script: echo "hello" # TODO: replace this by a script which pushes to upstream branch (e.g. dev -> master)
       after_success:
         - skip
 
@@ -52,6 +48,6 @@ notifications:
   email:
     recipients:
       - siavosh@ualberta.ca
-      #- other@example.com
+
     on_success: never # default: change
     on_failure: always # default: always

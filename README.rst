@@ -35,7 +35,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. code-block:: bash
 
-    ./run_all_tests.sh
+    make test
 
 .. raw:: html
 

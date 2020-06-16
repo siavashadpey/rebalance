@@ -11,17 +11,14 @@ class Cash:
     """
     currency_rates = CurrencyRates()
 
-    def __init__(self, amount = None, currency = "CAD"):
+    def __init__(self, amount, currency = "CAD"):
         """
         Initialization.
 
         Args:
-            amount (float, optional): Amount of cash.
+            amount (float): Amount of cash.
             currency (str, optional): Currency of cash. Defaults to "CAD".
         """
-        if amount is None:
-            print("`amount` argument must be specified.")
-            raise TypeError
 
         self._amount = amount
         self._currency = currency.upper()
