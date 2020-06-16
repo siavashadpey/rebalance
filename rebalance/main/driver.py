@@ -1,4 +1,4 @@
-from rebalance import Portfolio, Asset, Cash
+from rebalance import Portfolio, Asset
 
 # My portfolio
 p = Portfolio()
