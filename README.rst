@@ -50,7 +50,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
                     <h3 class="ui header">Make a driver file:</h3>
 
-                    <p> The driver file is where we create our portfolio. We specify all of its assets and the available cash. </p>
+                    <p> The driver file is where we create our portfolio. We specify all of its assets and the available cash we have to invest. </p>
 
 .. code-block:: bash
 
@@ -67,7 +67,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. raw:: html
 
-                    <h3 class="ui header">Instantiate a portfolio:</h3>
+                    <h3 class="ui header">First we create our portfolio:</h3>
 
 .. code-block:: python
 
@@ -76,8 +76,31 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. raw:: html
 
-                    <h3 class="ui header">Add cash to our portfolio. </h3>
-                    <p> The amount and the currency must be specified.</p>
+                    <h3 class="ui header">Then we add our assets:</h3>
+                    <p> We must specify the ticker symbol and the quantity of each asset.</p>
+		    <p></p>
+		    <i>The portfolio used in this example is one of 
+		    	<a href="https://www.canadianportfoliomanagerblog.com/model-etf-portfolios/">
+		    	Canadian Portfolio Manager</a>'s model portfolios. This blog along with 
+		    	<a href="https://canadiancouchpotato.com/getting-started/">Canadian Couch Potato</a>
+			advocate low-cost, globally diversified index funds for DIY investors. </i>
+
+.. code-block:: python
+
+    # Assets in portfolio
+    # The price will be retrieved automatically
+    tickers = ["XBB.TO",   # iShares Core Canadian Universe Bond Index ETF
+    	       "XIC.TO",   # iShares Core S&P/TSX Capped Composite Index ETF
+	       "ITOT",     # iShares Core S&P Total U.S. Stock Market ETF
+	       "IEFA",     # iShares Core MSCI EAFE ETF
+	       "IEMG"]     # iShares Core MSCI Emerging Markets ETF
+    quantities = [36, 64, 32, 8, 7]
+    p.easy_add_assets(tickers=tickers, quantities=quantities)
+
+.. raw:: html
+
+                    <h3 class="ui header">We also need to add cash to our portfolio: </h3>
+                    <p> This is the amount that we are investing. We can add cash from different currencies.</p>
 
 .. code-block:: python
 
@@ -88,21 +111,9 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. raw:: html
 
-                    <h3 class="ui header">Specify the assets in our portfolio.</h3>
-                    <p> The ticker symbol and quantity of the assets must be specified.</p>
-
-.. code-block:: python
-
-    # Assets in portfolio
-    # The price will be retrieved automatically
-    tickers = ["XBB.TO", "XIC.TO", "ITOT", "IEFA", "IEMG"]
-    quantities = [36, 64, 32, 8, 7]
-    p.easy_add_assets(tickers=tickers, quantities=quantities)
-
-
-.. raw:: html
-
-                    <h3 class="ui header">Before rebalancing, we need to specify our target asset allocation.</h3>
+                    <h3 class="ui header">Finally, we need to specify our target asset allocation:</h3>
+		    <i> The target asset allocation used in this example is that of an
+		         aggressive portfolio with 80% equities and 20% bonds (XBB.TO). </i>
 
 .. code-block:: python
 
@@ -122,7 +133,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 .. code-block:: python
 
     # rebalance
-    p.selling_allowed = False # To allow or not to allow selling while rebalancing
+    p.selling_allowed = False # We don't want to sell any of our assets for this case
     p.rebalance(target_asset_alloc, verbose=True)
 
 .. raw:: html
@@ -154,6 +165,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. |Build Status| image:: https://travis-ci.org/siavashadpey/rebalance.svg?branch=master
 	:target: https://travis-ci.org/siavashadpey/rebalance.svg?branch=master
+	
 .. |Coverage| image:: https://coveralls.io/repos/github/siavashadpey/rebalance/badge.svg?branch=master
 	:target: https://coveralls.io/github/siavashadpey/rebalance?branch=master
 
