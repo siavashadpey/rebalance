@@ -35,7 +35,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. code-block:: bash
 
-    ./run_all_tests.sh
+    make test
 
 .. raw:: html
 
@@ -63,7 +63,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. code-block:: python
 
-    from rebalance import Portfolio, Asset, Cash
+    from rebalance import Portfolio, Asset
 
 .. raw:: html
 
@@ -77,7 +77,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 .. raw:: html
 
                     <h3 class="ui header">Then we add our assets:</h3>
-                    <p> We must specify the ticker symbol and the quantity of each asset.</p>
+                    <p> We must specify the ticker symbol and the quantity of each asset we currently have in our portfolio.</p>
 		    <p></p>
 		    <i>The portfolio used in this example is one of 
 		    	<a href="https://www.canadianportfoliomanagerblog.com/model-etf-portfolios/">
@@ -100,7 +100,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 .. raw:: html
 
                     <h3 class="ui header">We also need to add cash to our portfolio: </h3>
-                    <p> This is the amount that we are investing. We can add cash from different currencies.</p>
+                    <p> This is the amount that we are investing. We can add cash in different currencies.</p>
 
 .. code-block:: python
 

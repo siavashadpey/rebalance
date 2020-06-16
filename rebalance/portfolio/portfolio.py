@@ -177,7 +177,7 @@ class Portfolio:
 
 
         # If sell is  allowed, "sell everything" in new portfolio
-        if self._is_selling_allowed:
+        if self.selling_allowed:
             balanced_portfolio._sell_everything()
 
         # Convert all cash to one currency
@@ -204,7 +204,7 @@ class Portfolio:
             quantities_to_buy[i] = math.floor(solution.x[i]/balanced_portfolio.assets[ticker].price_in(self._common_currency))
             balanced_portfolio._buy_asset(ticker, quantities_to_buy[i])
             prices[ticker] = [balanced_portfolio.assets[ticker].price, balanced_portfolio.assets[ticker].currency] 
-            if self._is_selling_allowed:
+            if self.selling_allowed:
                 quantities_to_buy[i] -= self._assets[ticker].quantity
             new_units[ticker] = quantities_to_buy[i]
             investment_amount[i] = quantities_to_buy[i]*balanced_portfolio.assets[ticker].price

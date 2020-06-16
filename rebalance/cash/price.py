@@ -8,18 +8,14 @@ class Price:
     """
     An instance of :class:`Price` holds a price and a currency.    
     """
-    def __init__(self, price = None, currency = "CAD"):
+    def __init__(self, price, currency = "CAD"):
         """
         Initialization.
 
         Args:
-            price (float, optional): Price.
+            price (float): Price.
             currency (str, optional): Currency of price. Defaults to "CAD".
         """
-        if price is None:
-            print("`price` argument must be specified.")
-            raise TypeError
-
         self._price = price
         self._currency = currency.upper()
 
