@@ -43,6 +43,15 @@ jobs:
         - Upstream
       install: 
         - skip
-      script: echo "hello"
+      script: echo "hello" # TODO: replace this by a script which pushes from dev to master
       after_success:
         - skip
+
+
+notifications:
+  email:
+    recipients:
+      - siavosh@ualberta.ca
+      #- other@example.com
+    on_success: never # default: change
+    on_failure: always # default: always
