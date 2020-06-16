@@ -1,23 +1,24 @@
 
 from forex_python.converter import CurrencyRates
 
-#TODO: documentation 
-
 class Cash:
     """
-    An instance of Cash holds an amount and a currency.
+    An instance of :class:`Cash` holds an amount and a currency.
 
-    It is used as part of an asset class.
+    Attributes
+        currency_rates (forex_python.converter) : Used for currency conversion.
 
     """
     currency_rates = CurrencyRates()
-    def __init__(self,
-                 amount = None,
-                 currency = "CAD"
-    ):
-        if amount is None:
-            print("`amount` argument must be specified.")
-            raise TypeError
+
+    def __init__(self, amount, currency = "CAD"):
+        """
+        Initialization.
+
+        Args:
+            amount (float): Amount of cash.
+            currency (str, optional): Currency of cash. Defaults to "CAD".
+        """
 
         self._amount = amount
         self._currency = currency.upper()
@@ -26,7 +27,7 @@ class Cash:
     @property
     def amount(self):
         """
-            Gets and sets amount of cash in its own currency.
+        (float): Amount of cash.
         """
         return self._amount
 
@@ -37,15 +38,32 @@ class Cash:
     @property
     def currency(self):
         """
-            Gets currency of cash.
+        (str): Currency of cash.
         """
         return self._currency
 
     def amount_in(self, currency):
         """
-            Gets amount of cash in specified currency.
+        Converts amount of cash in specified currency.
+
+        Args:
+            currency (str): Currency in which to convert the amount of cash.
+
+        Returns:
+            (float): Amount of cash in specified currency.
         """
 
-        currency_exchange = Cash.currency_rates.get_rate(self.currency, currency.upper())
+        return self.exchange_rate(currency)*self._amount
 
-        return currency_exchange*self._amount
+    def exchange_rate(self, currency):
+        """
+        Obtain the exchange rate from ``cash``'s own currency to specified currency.
+
+        Args:
+            currency (str): Currency.
+
+        Returns:
+            (float): exchange rate.
+        """
+
+        return Cash.currency_rates.get_rate(self.currency, currency.upper())

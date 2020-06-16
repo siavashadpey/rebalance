@@ -1,10 +1,13 @@
+***************
 Documentation
-==================
+***************
 
 .. toctree::
    :maxdepth: 2
    
-   modules
+   rebalance.portfolio
+   rebalance.assets
+   rebalance.cash
    
 Indices and tables
 ==================

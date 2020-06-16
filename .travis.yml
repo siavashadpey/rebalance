@@ -1,12 +1,58 @@
+<<<<<<< HEAD
 language: 
   python
 
+=======
+language: python
+
+
+# only invoke travis-ci for certain branches
 branches:
   only:
     - master
     - dev
-    
-script: 
-  ./run_all_tests.sh
+
+before_script:
+  - skip
+
+script:
+  - Skip
 
 after_success: 
+  - skip
+
+stages:
+  - Testing
+  - name: Upstream
+    if: branch = master
+
+
+jobs:
+  include:
+    - name: Testing
+      stage: Testing
+      before_script: 
+        - pip install coverage==4.5.4
+        - pip install python-coveralls
+      script: 
+        - make coverage
+      after_success:
+        - coveralls
+    - name: 
+        - Upstream
+      stage: 
+        - Upstream
+      install: 
+        - skip
+      script: echo "hello" # TODO: replace this by a script which pushes to upstream branch (e.g. dev -> master)
+      after_success:
+        - skip
+
+
+notifications:
+  email:
+    recipients:
+      - siavosh@ualberta.ca
+
+    on_success: never # default: change
+    on_failure: always # default: always

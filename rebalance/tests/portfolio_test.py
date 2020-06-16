@@ -12,6 +12,11 @@ from forex_python.converter import CurrencyRates
 class TestPortfolio(unittest.TestCase):
 
     def test_cash_interface(self):
+        """
+        Test portfolio's interface related to Cash class.
+
+        Adding cash of different currency individually to the portfolio.
+        """
         p = Portfolio()
         amount1 = 500.15
         p.add_cash(amount1, "cad")
@@ -22,6 +27,11 @@ class TestPortfolio(unittest.TestCase):
         self.assertEqual(p.cash["USD"].amount, amount2)
 
     def test_cash_interface2(self):
+        """
+        Test portfolio's interface related to Cash class.
+
+        Collectively adding cash to the portfolio.
+        """
         p = Portfolio()
         amounts = [500.15, 200.00]
         currencies = ["CAD", "USD"]
@@ -32,12 +42,17 @@ class TestPortfolio(unittest.TestCase):
 
 
     def test_asset_interface(self):
+        """
+        Test portfolio's interface related to Asset class.
+
+        Adding assets individually to the portfolio.
+        """
         p = Portfolio()
 
         ticker = "VCN.TO"
         quantity = 2
         ticker_info = yf.Ticker(ticker).info
-        price = ticker_info["regularMarketOpen"]
+        price = ticker_info["ask"]
         asset = Asset(ticker=ticker, quantity = quantity)
 
         p.add_asset(asset)
@@ -55,6 +70,12 @@ class TestPortfolio(unittest.TestCase):
         self.assertEqual(asset2.price, p.assets[ticker].price)
 
     def test_asset_interface2(self):
+        """
+        Test portfolio's interface related to Asset class.
+
+        Collectively adding assets to the portfolio.
+        """
+
         p = Portfolio()
 
         tickers = ["VCN.TO", "ZAG.TO"]
@@ -64,9 +85,12 @@ class TestPortfolio(unittest.TestCase):
         for i in range(len(tickers)):
             self.assertEqual(tickers[i], p.assets[tickers[i]].ticker)
             self.assertEqual(quantities[i], p.assets[tickers[i]].quantity)
-            self.assertEqual(yf.Ticker(tickers[i]).info["regularMarketOpen"], p.assets[tickers[i]].price)
+            self.assertEqual(yf.Ticker(tickers[i]).info["ask"], p.assets[tickers[i]].price)
 
     def test_asset_allocation(self):
+        """
+        Test asset allocation method.
+        """
         p = Portfolio()
 
         tickers = ["VCN.TO", "ZAG.TO", "XAW.TO", "TSLA"]
@@ -79,24 +103,86 @@ class TestPortfolio(unittest.TestCase):
 
         rates = CurrencyRates()
 
-        prices = [yf.Ticker(ticker).info["regularMarketOpen"]*rates.get_rate(yf.Ticker(ticker).info["currency"], "CAD") for ticker in tickers]
+        prices = [yf.Ticker(ticker).info["ask"]*rates.get_rate(yf.Ticker(ticker).info["currency"], "CAD") for ticker in tickers]
         total = np.sum(np.asarray(quantities)*np.asarray(prices))
         for i in range(len(tickers)):
-            self.assertAlmostEqual(asset_alloc[tickers[i]], quantities[i]*prices[i]/total*100.)
+            self.assertAlmostEqual(asset_alloc[tickers[i]], quantities[i]*prices[i]/total*100., 1)
 
     def test_rebalancing(self):
+        """
+        Test rebalancing algorithm.
+
+        This might break over time as prices increase.
+        If we have enough cash though, the optimizer should ideally
+        be able to match the target asset allocation
+        pretty closely
+        """
+
         p = Portfolio()
 
-        tickers = ["VCN.TO", "ZAG.TO", "XAW.TO"]
-        quantities = [5, 20, 12]
+        tickers = ["XBB.TO", "XIC.TO", "ITOT", "IEFA", "IEMG"]
+        quantities = [36, 64, 32, 8, 7]
         p.easy_add_assets(tickers=tickers, quantities = quantities)
+        p.add_cash(3000, "USD")
         p.add_cash(515.21, "CAD")
         p.selling_allowed = True
-        #for ticker in p.assets.keys():
-        #    print(ticker, p.assets[ticker].price)
 
-        target_allocation = {"VCN.TO": 20., "ZAG.TO": 40., "XAW.TO": 40.}
-        p.rebalance(target_allocation)
+        self.assertTrue(p.selling_allowed)
+
+        # different order than tickers.
+        # rebalance method should be able to handle such a case
+        target_asset_alloc = {
+        "XBB.TO": 20,
+        "XIC.TO": 20,
+        "IEFA":   20,
+        "ITOT":   36,
+        "IEMG":    4
+        }
+
+        (_, _, _, max_diff) = p.rebalance(target_asset_alloc, verbose=True)
+        self.assertLessEqual(max_diff, 2.)
+
+        # Error handling
+        with self.assertRaises(Exception):
+            target_asset_alloc = {
+            "XBB.TO": 20,
+            "XIC.TO": 20,
+            "IEFA":   20,
+            }
+            p.rebalance(target_asset_alloc)
+
+    def test_rebalancing2(self):
+        """
+        Test rebalancing algorithm. Part 2.
+
+        Cash is not in the same currency as the assets.
+        """
+        p = Portfolio()
+
+        p.add_cash(200., "USD")
+        p.add_cash(300., "USD")
+
+        tickers = ["VCN.TO", "XAW.TO", "ZAG.TO"]
+        quantities = [5, 12, 20]
+        p.easy_add_assets(tickers=tickers, quantities=quantities)
+
+        target_asset_alloc = {
+        "VCN.TO": 40.0,
+        "ZAG.TO": 40.0,
+        "XAW.TO": 20.0,
+        }
+
+        p.selling_allowed = True
+        (_, prices, exchange_rates, _) = p.rebalance(target_asset_alloc)
+        
+        # The prices should be in the tickers' currency
+        for ticker in tickers:
+            self.assertEqual(prices[ticker][1], "CAD")
+
+
+        # since our cash is in USD but our assets are in CAD
+        # it outputs this conversion rate 
+        self.assertTrue("CAD" in exchange_rates.keys())
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ AUTHOR_EMAIL = 'siavosh@ualberta.ca'
 PROJECT_ROOT = dirname(realpath(__file__))
 
 # Get the long description from the README file
-with open(join(PROJECT_ROOT, 'README.md'), encoding='utf-8') as buff:
+with open(join(PROJECT_ROOT, 'README.rst'), encoding='utf-8') as buff:
     LONG_DESCRIPTION = buff.read()
 
 REQUIREMENTS_FILE = join(PROJECT_ROOT, 'requirements.txt')
@@ -40,4 +40,5 @@ if __name__ == "__main__":
           packages=find_packages(),
           python_requires=">=3.6",
           tests_require=test_reqs,
+          url="https://rebalance.readthedocs.io/",
           install_requires=install_reqs)

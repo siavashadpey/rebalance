@@ -5,4 +5,3 @@ rebalance
    :maxdepth: 4
 
    rebalance
-   setup
