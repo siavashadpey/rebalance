@@ -122,9 +122,7 @@ class Portfolio:
         """
         
         # Obtain all market values in 1 currency (doesn't matter which) 
-        total_value = 0.
-        for asset in self._assets.values():
-            total_value += asset.market_value_in(self._common_currency)
+        total_value = self.total_market_value(self._common_currency)
 
         total_value = max(1., total_value) # protect against division by 0 (total_value = 0, means new portfolio)
         
@@ -133,6 +131,24 @@ class Portfolio:
             asset_allocation[name] = asset.market_value_in(self._common_currency)/total_value*100.
 
         return asset_allocation
+
+    def total_market_value(self, currency):
+        """
+            Computes the total market value of the assets in the portfolio.
+
+            Args:
+                currency (str): The currency in which to obtain the value.
+
+            Returns:
+                float: The total market value of the assets in the portfolio.
+        """
+
+        mv = 0.
+        for asset in self.assets.values():
+            mv += asset.market_value_in(currency)
+
+        return mv
+
 
     def rebalance(self, target_allocation, verbose=False):
 
@@ -191,23 +207,28 @@ class Portfolio:
         bound = (0.00, total_cash)
         bounds = ((bound,)*nb_assets)
         constraints = [{'type': 'ineq', 'fun': lambda new_asset_values: balanced_portfolio.cash[self._common_currency].amount - np.sum(new_asset_values)}] # Can't buy more than available cash
-        new_asset_values0 = np.ones(nb_assets)
         current_asset_values = np.array([asset.market_value_in(self._common_currency) for asset in balanced_portfolio.assets.values()])
-        solution = minimize(balanced_portfolio._rebalance_objective_function, new_asset_values0, args=(current_asset_values, target_allocation_np), method='SLSQP', bounds=bounds, constraints=constraints)
+        new_asset_values0 = target_allocation_np/100.*(balanced_portfolio.total_market_value(self._common_currency) + balanced_portfolio.cash[self._common_currency].amount) - current_asset_values
+
+        solution = minimize(balanced_portfolio._rebalance_objective_function, new_asset_values0, args=(current_asset_values, target_allocation_np/100.), method='SLSQP', bounds=bounds, constraints=constraints)
 
         # Buy assets based on optimization solution
-        quantities_to_buy = np.zeros_like(solution.x).astype(int)
-        investment_amount = np.zeros_like(solution.x)
         new_units = {}
         prices = {}
-        for i, ticker in zip(range(nb_assets), balanced_portfolio.assets.keys()):
-            quantities_to_buy[i] = math.floor(solution.x[i]/balanced_portfolio.assets[ticker].price_in(self._common_currency))
-            balanced_portfolio._buy_asset(ticker, quantities_to_buy[i])
-            prices[ticker] = [balanced_portfolio.assets[ticker].price, balanced_portfolio.assets[ticker].currency] 
+        investment_amount = {}
+        for sol_mv, ticker in zip(solution.x, balanced_portfolio.assets.keys()):
             if self.selling_allowed:
-                quantities_to_buy[i] -= self._assets[ticker].quantity
-            new_units[ticker] = quantities_to_buy[i]
-            investment_amount[i] = quantities_to_buy[i]*balanced_portfolio.assets[ticker].price
+                # first buy original assets, then see how much you need to buy or sell extra
+                # this method discourages selling when optimizer finds a solution very close to original holding
+                # (e.g. optimizer: buy 4.8 --> rounds to 4, original = 5)
+                balanced_portfolio._buy_asset(ticker, self._assets[ticker].quantity)
+                new_units[ticker] = int( (sol_mv - self._assets[ticker].market_value_in(self._common_currency))/ balanced_portfolio.assets[ticker].price_in(self._common_currency)) # round towards 0
+            else:
+                new_units[ticker] = int(sol_mv /balanced_portfolio.assets[ticker].price_in(self._common_currency))
+
+            balanced_portfolio._buy_asset(ticker, new_units[ticker])
+            prices[ticker] = [balanced_portfolio.assets[ticker].price, balanced_portfolio.assets[ticker].currency] 
+            investment_amount[ticker] = new_units[ticker]*balanced_portfolio.assets[ticker].price
 
         old_asset_allocation = self.asset_allocation()
         new_asset_allocation = balanced_portfolio.asset_allocation()
@@ -228,12 +249,13 @@ class Portfolio:
 
         if verbose:
             # Print shares to buy, cost, new allocation, old allocation target, and target allocation
+            print("")
             print(" Ticker    Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation")
             print("                    to buy         ($)                      (%)              (%)                 (%)"         )
             print("-------------------------------------------------------------------------------------------------------------")
-            for i, ticker in zip(range(nb_assets), balanced_portfolio.assets.keys()):
+            for ticker in balanced_portfolio.assets.keys():
                 print("%8s  %3.2f   %6.d        %8.2f     %4s          %5.2f            %5.2f                %5.2f" % \
-                (ticker, prices[ticker][0], quantities_to_buy[i], investment_amount[i], prices[ticker][1], old_asset_allocation[ticker], new_asset_allocation[ticker], target_allocation[ticker]))
+                (ticker, prices[ticker][0], new_units[ticker], investment_amount[ticker], prices[ticker][1], old_asset_allocation[ticker], new_asset_allocation[ticker], target_allocation[ticker]))
         
             # Print remaining cash
             print("")
@@ -259,22 +281,25 @@ class Portfolio:
             Args:
                 new_asset_values (np.ndarray): Market value of assets to buy.
                 current_asset_vales (np.ndarray): Portfolio's current Market values of assets (in same currency as ``new_asset_values``).
-                target_allocation: (np.ndarray): Target asset allocation (in %).
+                target_allocation: (np.ndarray): Target asset allocation (in decimal).
 
             Returns:
                 float: Value of objective function.
         """
 
+        # total asset value
+        asset_vals = current_asset_values + new_asset_values
+        tot_asset_val = np.sum(asset_vals)
         # compute current allocation
-        current_allocation = (current_asset_values + new_asset_values)/(np.sum(current_asset_values + new_asset_values))*100.      
+        current_allocation = asset_vals/tot_asset_val     
 
         # Penalize asset allocation's far from target allocation (we use L2 norm)
         asset_alloc_diff = target_allocation - current_allocation
-        j1 = np.inner(asset_alloc_diff, asset_alloc_diff)
+        j1 = np.inner(asset_alloc_diff, asset_alloc_diff) # range: (0, 1)
 
         # Penalize unused cash (we use L2 norm)
-        cash_diff = self._cash[self._common_currency].amount - np.sum(new_asset_values)
-        j2 = 50.*np.inner(cash_diff, cash_diff)
+        cash_diff = (self._cash[self._common_currency].amount - np.sum(new_asset_values))/(self._cash[self._common_currency].amount + np.sum(new_asset_values))
+        j2 = cash_diff*cash_diff # range: (0, 1)
 
         return j1 + j2
 
