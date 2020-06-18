@@ -87,6 +87,24 @@ class TestPortfolio(unittest.TestCase):
             self.assertEqual(quantities[i], p.assets[tickers[i]].quantity)
             self.assertEqual(yf.Ticker(tickers[i]).info["ask"], p.assets[tickers[i]].price)
 
+    def test_market_value(self):
+        """
+        Test total market value method.
+        """
+
+        p = Portfolio()
+
+        tickers = ["VCN.TO", "ZAG.TO", "XAW.TO", "TSLA"]
+        quantities = [2, 20, 10, 4]
+        p.easy_add_assets(tickers=tickers, quantities = quantities)
+
+        mv = p.total_market_value("CAD")
+
+        total = np.sum([asset.market_value_in("CAD") for asset in p.assets.values()])
+
+        self.assertAlmostEqual(mv, total, 1)
+
+
     def test_asset_allocation(self):
         """
         Test asset allocation method.
@@ -172,8 +190,8 @@ class TestPortfolio(unittest.TestCase):
         "XAW.TO": 20.0,
         }
 
-        p.selling_allowed = True
-        (_, prices, exchange_rates, _) = p.rebalance(target_asset_alloc)
+        p.selling_allowed = False
+        (_, prices, exchange_rates, _) = p.rebalance(target_asset_alloc, verbose=True)
         
         # The prices should be in the tickers' currency
         for ticker in tickers:
@@ -183,6 +201,8 @@ class TestPortfolio(unittest.TestCase):
         # since our cash is in USD but our assets are in CAD
         # it outputs this conversion rate 
         self.assertTrue("CAD" in exchange_rates.keys())
+        for init_quantity, asset in zip(quantities, p.assets.values()):
+            self.assertGreaterEqual(asset.quantity, init_quantity) # since no selling was allowed
 
 
 if __name__ == '__main__':
