@@ -209,7 +209,7 @@ class Portfolio:
         constraints = [{'type': 'ineq', 'fun': lambda new_asset_values: balanced_portfolio.cash[self._common_currency].amount - np.sum(new_asset_values)}] # Can't buy more than available cash
         current_asset_values = np.array([asset.market_value_in(self._common_currency) for asset in balanced_portfolio.assets.values()])
         new_asset_values0 = target_allocation_np/100.*(balanced_portfolio.total_market_value(self._common_currency) + balanced_portfolio.cash[self._common_currency].amount) - current_asset_values
-
+        
         solution = minimize(balanced_portfolio._rebalance_objective_function, new_asset_values0, args=(current_asset_values, target_allocation_np/100.), method='SLSQP', bounds=bounds, constraints=constraints)
 
         # Buy assets based on optimization solution
@@ -250,11 +250,11 @@ class Portfolio:
         if verbose:
             # Print shares to buy, cost, new allocation, old allocation target, and target allocation
             print("")
-            print(" Ticker    Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation")
-            print("                    to buy         ($)                      (%)              (%)                 (%)"         )
-            print("-------------------------------------------------------------------------------------------------------------")
+            print(" Ticker      Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation")
+            print("                      to buy         ($)                      (%)              (%)                 (%)"         )
+            print("---------------------------------------------------------------------------------------------------------------")
             for ticker in balanced_portfolio.assets.keys():
-                print("%8s  %3.2f   %6.d        %8.2f     %4s          %5.2f            %5.2f                %5.2f" % \
+                print("%8s  %7.2f   %6.d        %8.2f     %4s          %5.2f            %5.2f               %5.2f" % \
                 (ticker, prices[ticker][0], new_units[ticker], investment_amount[ticker], prices[ticker][1], old_asset_allocation[ticker], new_asset_allocation[ticker], target_allocation[ticker]))
         
             # Print remaining cash
