@@ -87,9 +87,9 @@ class TestPortfolio(unittest.TestCase):
             self.assertEqual(quantities[i], p.assets[tickers[i]].quantity)
             self.assertEqual(yf.Ticker(tickers[i]).info["ask"], p.assets[tickers[i]].price)
 
-    def test_market_value(self):
+    def test_portfolio_value(self):
         """
-        Test total market value method.
+        Test total market value, total cash value, and total value methods.
         """
 
         p = Portfolio()
@@ -100,9 +100,21 @@ class TestPortfolio(unittest.TestCase):
 
         mv = p.total_market_value("CAD")
 
-        total = np.sum([asset.market_value_in("CAD") for asset in p.assets.values()])
+        total_mv = np.sum([asset.market_value_in("CAD") for asset in p.assets.values()])
 
-        self.assertAlmostEqual(mv, total, 1)
+        self.assertAlmostEqual(mv, total_mv, 1)
+
+        amounts = [500.15, 200.00]
+        currencies = ["CAD", "USD"]
+        p.easy_add_cash(amounts, currencies)
+
+        cv = p.total_cash_value("CAD")
+
+        usd_to_cad = CurrencyRates().get_rate("USD", "CAD")
+        total_cv = np.sum(amounts[0] + amounts[1]*usd_to_cad)
+        self.assertAlmostEqual(cv, total_cv, 1)
+
+        self.assertAlmostEqual(p.total_value("CAD"), total_mv + total_cv, 1)
 
 
     def test_asset_allocation(self):
@@ -126,6 +138,35 @@ class TestPortfolio(unittest.TestCase):
         for i in range(len(tickers)):
             self.assertAlmostEqual(asset_alloc[tickers[i]], quantities[i]*prices[i]/total*100., 1)
 
+    def test_exchange(self):
+        """
+        Test currency exchange in Portfolio.
+        """
+
+        p = Portfolio()
+
+        amounts = [500.15, 200.00]
+        currencies = ["CAD", "USD"]
+        p.easy_add_cash(amounts, currencies)
+
+        cad_to_usd = CurrencyRates().get_rate("CAD", "USD")
+
+        p.exchange_currency(to_currency="CAD", from_currency="USD", to_amount=100)
+        self.assertAlmostEqual(p.cash["CAD"].amount, 500.15 + 100., 1)
+        self.assertAlmostEqual(p.cash["USD"].amount, 200. - 100.*cad_to_usd, 1)
+        
+        p.exchange_currency(from_currency="USD", to_currency="CAD", from_amount=50)
+        self.assertAlmostEqual(p.cash["CAD"].amount, 500.15 + 100 + 50/cad_to_usd, 1)
+        self.assertAlmostEqual(p.cash["USD"].amount, 200. - 100.*cad_to_usd - 50, 1)
+
+        # error handling:
+        with self.assertRaises(Exception):
+            p.exchange_currency(to_currency="CAD", from_currency="USD", to_amount=100, from_amount=20)
+
+        # error handling
+        with self.assertRaises(Exception):
+            p.exchange_currency(to_currency="CAD", from_currency="USD")
+
     def test_rebalancing(self):
         """
         Test rebalancing algorithm.
@@ -143,6 +184,7 @@ class TestPortfolio(unittest.TestCase):
         p.easy_add_assets(tickers=tickers, quantities = quantities)
         p.add_cash(3000, "USD")
         p.add_cash(515.21, "CAD")
+        p.add_cash(5.00, "GBP")
         p.selling_allowed = True
 
         self.assertTrue(p.selling_allowed)
@@ -157,7 +199,10 @@ class TestPortfolio(unittest.TestCase):
         "IEMG":    4
         }
 
+        initial_value = p.total_value("CAD")
         (_, _, _, max_diff) = p.rebalance(target_asset_alloc, verbose=True)
+        final_value = p.total_value("CAD")
+        self.assertAlmostEqual(initial_value, final_value, 1)
         self.assertLessEqual(max_diff, 2.)
 
         # Error handling
@@ -178,7 +223,7 @@ class TestPortfolio(unittest.TestCase):
         p = Portfolio()
 
         p.add_cash(200., "USD")
-        p.add_cash(300., "USD")
+        p.add_cash(250., "GBP")
 
         tickers = ["VCN.TO", "XAW.TO", "ZAG.TO"]
         quantities = [5, 12, 20]
@@ -190,19 +235,16 @@ class TestPortfolio(unittest.TestCase):
         "XAW.TO": 20.0,
         }
 
+        initial_value = p.total_value("CAD")
         p.selling_allowed = False
         (_, prices, exchange_rates, _) = p.rebalance(target_asset_alloc, verbose=True)
+        final_value = p.total_value("CAD")
+        self.assertAlmostEqual(initial_value, final_value, 1)
         
         # The prices should be in the tickers' currency
         for ticker in tickers:
             self.assertEqual(prices[ticker][1], "CAD")
 
-
-        # since our cash is in USD but our assets are in CAD
-        # it outputs this conversion rate 
-        self.assertTrue("CAD" in exchange_rates.keys())
-        for init_quantity, asset in zip(quantities, p.assets.values()):
-            self.assertGreaterEqual(asset.quantity, init_quantity) # since no selling was allowed
 
 
 if __name__ == '__main__':
