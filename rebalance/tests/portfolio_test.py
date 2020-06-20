@@ -98,7 +98,7 @@ class TestPortfolio(unittest.TestCase):
         quantities = [2, 20, 10, 4]
         p.easy_add_assets(tickers=tickers, quantities = quantities)
 
-        mv = p.total_market_value("CAD")
+        mv = p.market_value("CAD")
 
         total_mv = np.sum([asset.market_value_in("CAD") for asset in p.assets.values()])
 
@@ -108,13 +108,13 @@ class TestPortfolio(unittest.TestCase):
         currencies = ["CAD", "USD"]
         p.easy_add_cash(amounts, currencies)
 
-        cv = p.total_cash_value("CAD")
+        cv = p.cash_value("CAD")
 
         usd_to_cad = CurrencyRates().get_rate("USD", "CAD")
         total_cv = np.sum(amounts[0] + amounts[1]*usd_to_cad)
         self.assertAlmostEqual(cv, total_cv, 1)
 
-        self.assertAlmostEqual(p.total_value("CAD"), total_mv + total_cv, 1)
+        self.assertAlmostEqual(p.value("CAD"), total_mv + total_cv, 1)
 
 
     def test_asset_allocation(self):
@@ -199,9 +199,9 @@ class TestPortfolio(unittest.TestCase):
         "IEMG":    4
         }
 
-        initial_value = p.total_value("CAD")
+        initial_value = p.value("CAD")
         (_, _, _, max_diff) = p.rebalance(target_asset_alloc, verbose=True)
-        final_value = p.total_value("CAD")
+        final_value = p.value("CAD")
         self.assertAlmostEqual(initial_value, final_value, 1)
         self.assertLessEqual(max_diff, 2.)
 
@@ -235,10 +235,10 @@ class TestPortfolio(unittest.TestCase):
         "XAW.TO": 20.0,
         }
 
-        initial_value = p.total_value("CAD")
+        initial_value = p.value("CAD")
         p.selling_allowed = False
-        (_, prices, exchange_rates, _) = p.rebalance(target_asset_alloc, verbose=True)
-        final_value = p.total_value("CAD")
+        (_, prices, _, _) = p.rebalance(target_asset_alloc, verbose=True)
+        final_value = p.value("CAD")
         self.assertAlmostEqual(initial_value, final_value, 1)
         
         # The prices should be in the tickers' currency
@@ -246,6 +246,10 @@ class TestPortfolio(unittest.TestCase):
             self.assertEqual(prices[ticker][1], "CAD")
 
 
+        # Since there was no CAD to start off with,
+        # there should be none (i.e. amount converted to CAD should be the amount used to purchase CAD assets)
+        self.assertAlmostEqual(self.cash["CAD"].amount, 0., 1)
+        
 
 if __name__ == '__main__':
     unittest.main()
