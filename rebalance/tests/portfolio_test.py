@@ -247,8 +247,9 @@ class TestPortfolio(unittest.TestCase):
 
 
         # Since there was no CAD to start off with,
-        # there should be none (i.e. amount converted to CAD should be the amount used to purchase CAD assets)
-        self.assertAlmostEqual(self.cash["CAD"].amount, 0., 1)
+        # there should be none after rebalacing either
+        # (i.e. amount converted to CAD should be the amount used to purchase CAD assets)
+        self.assertAlmostEqual(p.cash["CAD"].amount, 0., 1)
         
 
 if __name__ == '__main__':
