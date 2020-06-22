@@ -47,7 +47,7 @@ class Portfolio:
             currency (str) : Currency of cash
         """
 
-        if currency.upper() not in self._cash.keys():
+        if currency.upper() not in self._cash:
             self._cash[currency.upper()] = Cash(amount, currency)
         else:
             self._cash[currency.upper()].amount += amount
@@ -202,7 +202,7 @@ class Portfolio:
         # order target_allocation dict in the same order as assets dict and upper key
         target_allocation_reordered = {}
         try:
-            for key in self._assets.keys():
+            for key in self._assets:
                 target_allocation_reordered[key] = target_allocation[key]
         except:
             raise Exception(
@@ -281,7 +281,7 @@ class Portfolio:
                     self.assets[ticker].price_in(self._common_currency))
 
             asset_i = self.assets[ticker]
-            if asset_i.currency not in currency_cost.keys():
+            if asset_i.currency not in currency_cost:
                 currency_cost[asset_i.currency] = asset_i.cost_of(
                     new_units[ticker])
             else:
@@ -326,7 +326,7 @@ class Portfolio:
             print(
                 "---------------------------------------------------------------------------------------------------------------"
             )
-            for ticker in balanced_portfolio.assets.keys():
+            for ticker in balanced_portfolio.assets:
                 print("%8s  %7.2f   %6.d        %8.2f     %4s          %5.2f            %5.2f               %5.2f" % \
                 (ticker, prices[ticker][0], new_units[ticker], cost[ticker], prices[ticker][1], old_alloc[ticker], new_alloc[ticker], target_allocation[ticker]))
 
@@ -447,8 +447,8 @@ class Portfolio:
 
         to_conv = {}
         from_conv = copy.deepcopy(self.cash)
-        for curr in currency_amount.keys():
-            if curr not in self.cash.keys():
+        for curr in currency_amount:
+            if curr not in self.cash:
                 from_conv[curr] = Cash(0.00, curr)
 
             to = currency_amount[curr] - from_conv[curr].amount
