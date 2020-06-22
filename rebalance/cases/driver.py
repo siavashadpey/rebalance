@@ -16,13 +16,13 @@ p.easy_add_assets(tickers=tickers, quantities=quantities)
 
 # Target asset allocation (in %)
 target_asset_alloc = {
-"XBB.TO": 20,
-"XIC.TO": 20,
-"ITOT":   36,
-"IEFA":   20,
-"IEMG":    4
+    "XBB.TO": 20,
+    "XIC.TO": 20,
+    "ITOT": 36,
+    "IEFA": 20,
+    "IEMG": 4
 }
 
 # rebalance
-p.selling_allowed = True # Don't allow selling while rebalancing
+p.selling_allowed = True  # Don't allow selling while rebalancing
 p.rebalance(target_asset_alloc, verbose=True)

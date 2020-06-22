@@ -1,14 +1,13 @@
-
-
 from rebalance import Cash
 
 from forex_python.converter import CurrencyRates
+
 
 class Price:
     """
     An instance of :class:`Price` holds a price and a currency.    
     """
-    def __init__(self, price, currency = "CAD"):
+    def __init__(self, price, currency="CAD"):
         """
         Initialization.
 
@@ -43,10 +42,7 @@ class Price:
         Returns:
             (float): Price in specified currency.
         """
-        currency_exchange = Cash.currency_rates.get_rate(self.currency, currency.upper())
+        currency_exchange = Cash.currency_rates.get_rate(
+            self.currency, currency.upper())
 
-        return currency_exchange*self._price
-    
-    
-    
-
+        return currency_exchange * self._price

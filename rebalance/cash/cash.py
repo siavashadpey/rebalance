@@ -1,5 +1,5 @@
-
 from forex_python.converter import CurrencyRates
+
 
 class Cash:
     """
@@ -11,7 +11,7 @@ class Cash:
     """
     currency_rates = CurrencyRates()
 
-    def __init__(self, amount, currency = "CAD"):
+    def __init__(self, amount, currency="CAD"):
         """
         Initialization.
 
@@ -22,7 +22,6 @@ class Cash:
 
         self._amount = amount
         self._currency = currency.upper()
-
 
     @property
     def amount(self):
@@ -53,7 +52,7 @@ class Cash:
             (float): Amount of cash in specified currency.
         """
 
-        return self.exchange_rate(currency)*self._amount
+        return self.exchange_rate(currency) * self._amount
 
     def exchange_rate(self, currency):
         """
