@@ -253,7 +253,7 @@ class TestPortfolio(unittest.TestCase):
         p.selling_allowed = False
         (_, prices, _, _) = p.rebalance(target_asset_alloc, verbose=True)
         final_value = p.value("CAD")
-        self.assertAlmostEqual(initial_value, final_value, 1)
+        self.assertAlmostEqual(initial_value, final_value, -1)
 
         # The prices should be in the tickers' currency
         for ticker in tickers:

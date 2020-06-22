@@ -340,9 +340,14 @@ class Portfolio:
             # Print conversion exchange
             if len(exchange_history) > 0:
                 print("")
-                print(
-                    "Before making the above purchases, the following currency conversion(s) are(is) required:"
-                )
+                if len(exchange_history) > 1:
+                    print(
+                        "Before making the above purchases, the following currency conversions are required:"
+                    )
+                else:
+                    print(
+                        "Before making the above purchases, the following currency conversion is required:"
+                    )
 
                 for exchange in exchange_history:
                     (from_amount, from_currency, to_amount, to_currency,
