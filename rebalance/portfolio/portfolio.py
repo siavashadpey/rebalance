@@ -263,6 +263,7 @@ class Portfolio:
                             bounds=bounds,
                             constraints=constraints)
 
+        
         # See how many units of each asset you need to buy based on optimization solution
         # and total cost/currency
         new_units = {}
@@ -270,15 +271,12 @@ class Portfolio:
         for sol_mv, ticker in zip(solution.x,
                                   balanced_portfolio.assets.keys()):
             if self.selling_allowed:
-                # first buy original assets, then see how much you need to buy or sell extra
-                # this method discourages selling when optimizer finds a solution very close to original holding
-                # (e.g. optimizer: buy 4.8 --> rounds to 4, original = 5)
-                new_units[ticker] = int(
+                new_units[ticker] = math.floor(
                     (sol_mv - self.assets[ticker].market_value_in(
                         self._common_currency)) / self.assets[ticker].price_in(
-                            self._common_currency))  # round towards 0
+                            self._common_currency))
             else:
-                new_units[ticker] = int(
+                new_units[ticker] = math.floor(
                     sol_mv /
                     self.assets[ticker].price_in(self._common_currency))
 
