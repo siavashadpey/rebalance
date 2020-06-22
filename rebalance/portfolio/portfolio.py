@@ -426,6 +426,8 @@ class Portfolio:
         Return:
             float: Cost of transaction (in asset's own currency)
         """
+        if quantity == 0:
+            return 0.00
 
         asset = self.assets[ticker]
         cost = asset.buy(quantity)
@@ -449,6 +451,8 @@ class Portfolio:
         """
 
         # first, compute amount we have to convert to and amount we have for conversion
+        
+
         to_conv = {}
         from_conv = copy.deepcopy(self.cash)
         for curr in currency_amount.keys():
