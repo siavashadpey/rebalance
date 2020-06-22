@@ -1,7 +1,7 @@
-
 from rebalance import Price
 
 import yfinance as yf
+
 
 class Asset:
     """
@@ -25,7 +25,7 @@ class Asset:
         self._ticker = ticker
         self._quantity = quantity
         ticker_info = yf.Ticker(self._ticker).info
-        
+
         # we set the price to ask
         self._price = Price(ticker_info["ask"], ticker_info["currency"])
 
@@ -36,9 +36,9 @@ class Asset:
 
     @quantity.setter
     def quantity(self, quantity):
-        assert isinstance(quantity, int), "quantity must be integer." 
+        assert isinstance(quantity, int), "quantity must be integer."
         self._quantity = quantity
-    
+
     @property
     def price(self):
         """ 
@@ -76,7 +76,7 @@ class Asset:
         Returns:
             float: Market value of the asset (in asset's own currency).
         """
-        return self.price*self._quantity
+        return self.price * self._quantity
 
     def market_value_in(self, currency):
         """
@@ -88,14 +88,14 @@ class Asset:
         Returns:
             float: Market value of the asset.
         """
-        return self._price.price_in(currency)*self._quantity
+        return self._price.price_in(currency) * self._quantity
 
     def buy(self, quantity, currency=None):
         """
-            Buys a specified amount of the asset.
+            Buys (or sells) a specified amount of the asset.
 
             Args:
-                quantity (int): Quantity to buy.
+                quantity (int): If positive, it is the quantity to buy. If negative, it is the quantity to sell.
                 currency (str, optional): Currency in which to obtain cost. Defaults to asset's own currency.
 
             Returns:
@@ -103,9 +103,9 @@ class Asset:
         """
         self._quantity += quantity
         if currency is None:
-            return self._price.price*quantity
+            return self._price.price * quantity
         else:
-            return self._price.price_in(currency)*quantity
+            return self._price.price_in(currency) * quantity
 
     def cost_of(self, units, currency=None):
         """
@@ -119,9 +119,10 @@ class Asset:
             (float): Cost of the purchase.
         """
         if currency is None:
-            return self.price*units
+            return self.price * units
         else:
-            return self.price_in(currency)*units
+            return self.price_in(currency) * units
 
     def __str__(self):
-        return yf.Ticker(self._ticker).info['shortName'] + "(" + self._ticker + ")" 
+        return yf.Ticker(
+            self._ticker).info['shortName'] + "(" + self._ticker + ")"
