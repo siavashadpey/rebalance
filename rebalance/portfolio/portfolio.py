@@ -352,7 +352,7 @@ class Portfolio:
                 for exchange in exchange_history:
                     (from_amount, from_currency, to_amount, to_currency,
                      rate) = exchange
-                    print("    %.2f %s to %.2f %s at a rate of %.2f." %
+                    print("    %.2f %s to %.2f %s at a rate of %.4f." %
                           (from_amount, from_currency, to_amount, to_currency,
                            rate))
 
@@ -406,22 +406,16 @@ class Portfolio:
             Sells all assets in the portfolio and converts them to cash. 
         """
 
-        if self._common_currency not in self._cash.keys():
-            self._cash[self._common_currency] = Cash(0.00,
-                                                     self._common_currency)
-
-        for asset in self._assets.values():
-            self._cash[self._common_currency].amount += asset.market_value_in(
-                self._common_currency)
-            asset.quantity = 0
+        for ticker, asset in self._assets.items():
+            self.buy_asset(ticker, - asset.quantity)
 
     def buy_asset(self, ticker, quantity):
         """
-        Buys the specified amount of an asset.
+        Buys (or sells) the specified amount of an asset.
 
         Args:
             ticker (str): Ticker of asset to buy.
-            quantity (int): Quantity to buy.
+            quantity (int): If positive, it is the quantity to buy. If negative, it is the quantity to sell.
 
         Return:
             float: Cost of transaction (in asset's own currency)
@@ -431,7 +425,7 @@ class Portfolio:
 
         asset = self.assets[ticker]
         cost = asset.buy(quantity)
-        self.cash[asset.currency].amount -= cost
+        self.add_cash(-cost, asset.currency)
         return cost
 
     def _smart_exchange(self, currency_amount):
