@@ -104,8 +104,8 @@ class Asset:
         self._quantity += quantity
         if currency is None:
             return self._price.price * quantity
-        else:
-            return self._price.price_in(currency) * quantity
+        
+        return self._price.price_in(currency) * quantity
 
     def cost_of(self, units, currency=None):
         """
@@ -120,8 +120,8 @@ class Asset:
         """
         if currency is None:
             return self.price * units
-        else:
-            return self.price_in(currency) * units
+      
+        return self.price_in(currency) * units
 
     def __str__(self):
         return yf.Ticker(

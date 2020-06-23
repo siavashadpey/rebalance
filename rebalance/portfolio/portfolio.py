@@ -557,10 +557,12 @@ class Portfolio:
         if to_amount is None and from_amount is None:
             raise Exception(
                 "Argument `to_amount` or `from_amount` must be specified.")
-        elif to_amount is not None and from_amount is not None:
+        
+        if to_amount is not None and from_amount is not None:
             raise Exception(
                 "Please specify only `to_amount` or `from_amount`, not both.")
-        elif to_amount is not None:
+        
+        if to_amount is not None:
             from_amount = self.cash[to_currency].exchange_rate(
                 from_currency) * to_amount
         elif from_amount is not None:

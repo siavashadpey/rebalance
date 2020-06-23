@@ -81,7 +81,8 @@ class TestPortfolio(unittest.TestCase):
         quantities = [2, 20]
         p.easy_add_assets(tickers=tickers, quantities=quantities)
 
-        for i in range(len(tickers)):
+        n = len(tickers)
+        for i in range(n):
             self.assertEqual(tickers[i], p.assets[tickers[i]].ticker)
             self.assertEqual(quantities[i], p.assets[tickers[i]].quantity)
             self.assertEqual(
@@ -138,7 +139,8 @@ class TestPortfolio(unittest.TestCase):
             for ticker in tickers
         ]
         total = np.sum(np.asarray(quantities) * np.asarray(prices))
-        for i in range(len(tickers)):
+        n = len(tickers)
+        for i in range(n):
             self.assertAlmostEqual(asset_alloc[tickers[i]],
                                    quantities[i] * prices[i] / total * 100., 1)
 
