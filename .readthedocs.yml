@@ -3,10 +3,6 @@
 # Required
 version: 2
 
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-  configuration: docs/source/conf.py
-
 # Build documentation with MkDocs
 #mkdocs:
 #  configuration: mkdocs.yml
@@ -22,9 +18,10 @@ python:
     - requirements: docs/requirements.txt
     - requirements: requirements.txt
 
+# Build documentation in the docs/ directory with Sphinx
 sphinx:
   builder: html
-  configuration: conf.py
+  configuration: docs/source/conf.py
   fail_on_warning: false
 
 submodules:
