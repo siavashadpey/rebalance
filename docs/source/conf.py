@@ -34,7 +34,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
-    "numpydoc",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.napoleon",
 ]
