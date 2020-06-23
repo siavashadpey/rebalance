@@ -420,8 +420,8 @@ class Portfolio:
             float: Cost of transaction (in asset's own currency)
         """
 
-        # TODO: title - testing todo app
-        # BODY: body 
+        # @todo title - testing todo app
+        # @body body 
         if quantity == 0:
             return 0.00
 
