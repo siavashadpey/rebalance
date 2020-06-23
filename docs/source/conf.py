@@ -36,6 +36,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
 ]
 
 apidoc_module_dir = '../rebalance'
@@ -73,6 +74,7 @@ autodoc_default_flags = ['members', 'show-inheritance']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+html_add_permalinks = ""
 html_theme_path = ["."]
 html_theme = "semantic_sphinx"
 html_theme_options = {

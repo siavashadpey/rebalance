@@ -11,3 +11,10 @@ Welcome to rebalance's documentation!
 .. include:: ../../README.rst
 
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   modules
+   documentation
+   contact

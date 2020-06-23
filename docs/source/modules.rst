@@ -1,5 +1,5 @@
-rebalance package
-=================
+Modules
+=======
 
 .. toctree::
    :maxdepth: 4
