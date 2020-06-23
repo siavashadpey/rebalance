@@ -56,12 +56,12 @@ napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = False
-
+numpydoc_show_class_members = False
 
 todo_include_todos = False
 add_module_names = False
 
-autoclass_content = "both"
+#autoclass_content = "both"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -69,10 +69,10 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['setup.py', 'driver.py']
+exclude_patterns = ['setup.py', 'cases/*.py']
 
 autodoc_mock_imports = ['forex_python', 'yfinance', 'numpy', 'scipy', 'typing']
-autodoc_default_flags = ['members', 'private-members', 'special-members', 'inherited-members', 'show-inheritance']
+autodoc_default_flags = ['private-members', 'special-members', 'inherited-members', 'show-inheritance']
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -85,15 +85,7 @@ html_theme_options = {
     "navbar_links": [
     	("Home", master_doc),
         ("Documentation", "documentation"),
-        ("Contact", "contact")
-    #    ("Examples", "nb_examples/index"),
-    #    ("Books + Videos", "learn"),
-    #    ("API", "api"),
-    #    ("Developer Guide", "developer_guide"),
-    #    ("About PyMC3", "history")
-    ],
-    #     "fixed_sidebar": "false",
-    #     "description": "Probabilistic Programming in Python: Bayesian Modeling and Probabilistic Machine Learning with Theano"
+        ("Contact", "contact")]
 }
 html_sidebars = {"**": ["about.html", "navigation.html", "searchbox.html"]}
 
