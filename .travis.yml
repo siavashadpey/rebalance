@@ -13,7 +13,7 @@ before_script:
 script:
   - Skip
 
-after_success: 
+after_success:
   - skip
 
 stages:
@@ -26,18 +26,18 @@ jobs:
   include:
     - name: Testing
       stage: Testing
-      before_script: 
+      before_script:
         - pip install coverage==4.5.4
         - pip install python-coveralls
-      script: 
+      script:
         - make coverage
       after_success:
         - coveralls
-    - name: 
+    - name:
         - Upstream
-      stage: 
+      stage:
         - Upstream
-      install: 
+      install:
         - skip
       script: echo "hello" # TODO: replace this by a script which pushes to upstream branch (e.g. dev -> master)
       after_success:

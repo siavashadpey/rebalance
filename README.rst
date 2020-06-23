@@ -1,7 +1,7 @@
 Rebalance
 =========
 
-|Build status| |Coverage| |Docs|
+|Build status| |Coverage| |Code Factor| |Docs| 
 
 A calculator which tells you how to split your investment amongst your portfolio's assets based on your target asset allocation.
 
@@ -168,6 +168,9 @@ A calculator which tells you how to split your investment amongst your portfolio
 	
 .. |Coverage| image:: https://coveralls.io/repos/github/siavashadpey/rebalance/badge.svg?branch=master
 	:target: https://coveralls.io/repos/github/siavashadpey/rebalance/badge.svg?branch=master
+
+.. |Code Factor| image:: https://www.codefactor.io/repository/github/siavashadpey/rebalance/badge
+   :target: https://www.codefactor.io/repository/github/siavashadpey/rebalance
 
 .. |Docs| image:: https://readthedocs.org/projects/rebalance/badge/?version=latest
 	:target: https://rebalance.readthedocs.io/en/latest/?badge=latest
