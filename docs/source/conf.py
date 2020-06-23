@@ -56,7 +56,7 @@ napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = False
-numpydoc_show_class_members = False
+
 
 todo_include_todos = False
 add_module_names = False
@@ -72,7 +72,7 @@ templates_path = ['_templates']
 exclude_patterns = ['setup.py', 'cases/*.py']
 
 autodoc_mock_imports = ['forex_python', 'yfinance', 'numpy', 'scipy', 'typing']
-autodoc_default_flags = ['private-members', 'special-members', 'inherited-members', 'show-inheritance']
+autodoc_default_flags = ['members', 'private-members', 'special-members', 'show-inheritance']
 
 # -- Options for HTML output -------------------------------------------------
 
