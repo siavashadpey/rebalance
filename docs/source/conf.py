@@ -34,13 +34,14 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
+    "numpydoc",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.napoleon",
 ]
 
 apidoc_module_dir = '../rebalance'
 apidoc_output_dir = 'source'
-apidoc_excluded_paths = ['tests', 'main', 'setup.py']
+apidoc_excluded_paths = ['tests', 'cases', 'setup.py']
 apidoc_separate_modules = True
 
 # Napoleon settings
@@ -64,13 +65,9 @@ add_module_names = False
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['setup.py', 'cases/*.py']
 
 autodoc_mock_imports = ['forex_python', 'yfinance', 'numpy', 'scipy', 'typing']
-autodoc_default_flags = ['members', 'private-members', 'special-members', 'show-inheritance']
+autodoc_default_flags = ['members', 'show-inheritance']
 
 # -- Options for HTML output -------------------------------------------------
 
