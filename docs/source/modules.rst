@@ -1,5 +1,5 @@
-rebalance
-=========
+rebalance package
+=================
 
 .. toctree::
    :maxdepth: 4

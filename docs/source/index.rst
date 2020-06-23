@@ -8,6 +8,6 @@
 Welcome to rebalance's documentation!
 =====================================
 
-.. include:: ../../README.rst
+.. include:: ../../README
 
 
