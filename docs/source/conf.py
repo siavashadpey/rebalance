@@ -34,14 +34,14 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",
-    "numpydoc",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
 ]
 
 apidoc_module_dir = '../rebalance'
 apidoc_output_dir = 'source'
-apidoc_excluded_paths = ['tests', 'main', 'setup.py']
+apidoc_excluded_paths = ['tests', 'cases', 'setup.py']
 apidoc_separate_modules = True
 
 # Napoleon settings
@@ -57,43 +57,31 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = False
 
-
 todo_include_todos = False
 add_module_names = False
 
-autoclass_content = "both"
+#autoclass_content = "both"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['setup.py', 'driver.py']
 
 autodoc_mock_imports = ['forex_python', 'yfinance', 'numpy', 'scipy', 'typing']
-autodoc_default_flags = ['members', 'private-members', 'special-members', 'inherited-members', 'show-inheritance']
+autodoc_default_flags = ['members', 'show-inheritance']
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+html_add_permalinks = ""
 html_theme_path = ["."]
 html_theme = "semantic_sphinx"
 html_theme_options = {
     "navbar_links": [
     	("Home", master_doc),
         ("Documentation", "documentation"),
-        ("Contact", "contact")
-    #    ("Examples", "nb_examples/index"),
-    #    ("Books + Videos", "learn"),
-    #    ("API", "api"),
-    #    ("Developer Guide", "developer_guide"),
-    #    ("About PyMC3", "history")
-    ],
-    #     "fixed_sidebar": "false",
-    #     "description": "Probabilistic Programming in Python: Bayesian Modeling and Probabilistic Machine Learning with Theano"
+        ("Contact", "contact")]
 }
 html_sidebars = {"**": ["about.html", "navigation.html", "searchbox.html"]}
 

@@ -92,14 +92,14 @@ class Asset:
 
     def buy(self, quantity, currency=None):
         """
-            Buys (or sells) a specified amount of the asset.
+        Buys (or sells) a specified amount of the asset.
 
-            Args:
-                quantity (int): If positive, it is the quantity to buy. If negative, it is the quantity to sell.
-                currency (str, optional): Currency in which to obtain cost. Defaults to asset's own currency.
+        Args:
+            quantity (int): If positive, it is the quantity to buy. If negative, it is the quantity to sell.
+            currency (str, optional): Currency in which to obtain cost. Defaults to asset's own currency.
 
-            Returns:
-                (float): Cost of the units bought in specified ``currency``.
+        Returns:
+            (float): Cost of the units bought in specified ``currency``.
         """
         self._quantity += quantity
         if currency is None:
