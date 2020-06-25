@@ -97,8 +97,8 @@ A calculator which tells you how to split your investment amongst your portfolio
 .. code-block:: python
 
     # Cash in portfolio
-    cash_amounts = [500., 200.]
-    cash_currency = ["CAD", "USD"]
+    cash_amounts = [3000., 200.]
+    cash_currency = ["USD", "CAD"]
     p.easy_add_cash(amounts=cash_amounts, currencies=cash_currency)
 
 .. raw:: html
