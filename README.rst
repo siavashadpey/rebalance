@@ -55,7 +55,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. code-block:: python
 
-    from rebalance import Portfolio, Asset
+    from rebalance import Portfolio
 
 .. raw:: html
 
