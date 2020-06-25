@@ -31,14 +31,6 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. raw:: html
 
-                    <h3 class="ui header">Run the unit tests to see if package was successfully installed:</h3>
-
-.. code-block:: bash
-
-    make test
-
-.. raw:: html
-
             </div>
         </div>
 
