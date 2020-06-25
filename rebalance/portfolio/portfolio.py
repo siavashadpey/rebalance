@@ -182,6 +182,68 @@ class Portfolio:
 
         return self.market_value(currency) + self.cash_value(currency)
 
+    def buy_asset(self, ticker, quantity):
+        """
+        Buys (or sells) the specified amount of an asset.
+
+        Args:
+            ticker (str): Ticker of asset to buy.
+            quantity (int): If positive, it is the quantity to buy. If negative, it is the quantity to sell.
+
+        Return:
+            float: Cost of transaction (in asset's own currency)
+        """
+
+        if quantity == 0:
+            return 0.00
+
+        asset = self.assets[ticker]
+        cost = asset.buy(quantity)
+        self.add_cash(-cost, asset.currency)
+        return cost
+
+    def exchange_currency(self,
+                          to_currency,
+                          from_currency,
+                          to_amount=None,
+                          from_amount=None):
+        """
+        Performs currency exchange in Portfolio.
+
+        Args:
+            to_currency (str): Currency to which to perform the exchange
+            from_currency (str): Currency from which to perform the exchange
+            to_amount (float, optional): If specified, it is the amount to which we want to convert
+            from_amount (float, optional): If specified, it is the amount from which we want to convert
+
+        Note: either the `to_amount` or `from_amount` needs to be specifed.
+        """
+
+        from_currency = from_currency.upper()
+        to_currency = to_currency.upper()
+        
+        # add cash instances of both currencies to portfolio if non-existent
+        self.add_cash(0.0, from_currency)
+        self.add_cash(0.0, to_currency)
+        
+        if to_amount is None and from_amount is None:
+            raise Exception(
+                "Argument `to_amount` or `from_amount` must be specified.")
+        
+        if to_amount is not None and from_amount is not None:
+            raise Exception(
+                "Please specify only `to_amount` or `from_amount`, not both.")
+        
+        if to_amount is not None:
+            from_amount = self.cash[to_currency].exchange_rate(
+                from_currency) * to_amount
+        elif from_amount is not None:
+            to_amount = self.cash[from_currency].exchange_rate(
+                to_currency) * from_amount
+
+        self.add_cash(to_amount, to_currency)
+        self.add_cash(-from_amount, from_currency)
+
     def rebalance(self, target_allocation, verbose=False):
         """
             Rebalances the portfolio using the specified target allocation, the portfolio's current allocation,
@@ -215,10 +277,6 @@ class Portfolio:
         assert abs(np.sum(target_allocation_np) -
                    100.) <= 1E-2, "target allocation must sum up to 100%."
 
-        # Set common currency
-        self._common_currency = next(iter(
-            self._cash))  # first currency in cash dict
-
         # Make a new instance of portfolio
         # This is the one that is going to be rebalanced
         # We do not modify the current portfolio
@@ -229,46 +287,16 @@ class Portfolio:
             balanced_portfolio._sell_everything()
 
         # Convert all cash to one currency
-        total_cash = 0.
-        for cash in balanced_portfolio.cash.values():
-            total_cash += cash.amount_in(self._common_currency)
-        balanced_portfolio.cash = {
-            self._common_currency:
-            Cash(total_cash, balanced_portfolio._common_currency)
-        }
-
+        balanced_portfolio._combine_cash()
+        
         # Solve optimization problem
-        nb_assets = len(balanced_portfolio._assets)
-        bound = (0.00, total_cash)
-        bounds = ((bound, ) * nb_assets)
-        constraints = [{
-            'type':
-            'ineq',
-            'fun':
-            lambda new_asset_values: balanced_portfolio.cash[
-                self._common_currency].amount - np.sum(new_asset_values)
-        }]  # Can't buy more than available cash
-        current_asset_values = np.array([
-            asset.market_value_in(self._common_currency)
-            for asset in balanced_portfolio.assets.values()
-        ])
-        new_asset_values0 = target_allocation_np / 100. * balanced_portfolio.value(
-            self._common_currency) - current_asset_values
-
-        solution = minimize(balanced_portfolio._rebalance_objective_function,
-                            new_asset_values0,
-                            args=(current_asset_values,
-                                  target_allocation_np / 100.),
-                            method='SLSQP',
-                            bounds=bounds,
-                            constraints=constraints)
-
+        to_buy_vals = balanced_portfolio._rebalance_optimizer(target_allocation_np)
         
         # See how many units of each asset you need to buy based on optimization solution
         # and total cost/currency
         new_units = {}
         currency_cost = {}
-        for sol_mv, ticker in zip(solution.x,
+        for sol_mv, ticker in zip(to_buy_vals,
                                   balanced_portfolio.assets.keys()):
             if self.selling_allowed:
                 new_units[ticker] = math.floor(
@@ -288,7 +316,7 @@ class Portfolio:
                 currency_cost[asset_i.currency] += asset_i.cost_of(
                     new_units[ticker])
 
-        # Since we converted the cash to one commeon currency for the rebalancing calculation, revert back
+        # Since we converted the cash to one common currency for the rebalancing calculation, revert back
         balanced_portfolio.cash = copy.deepcopy(self.cash)
 
         # Since we might have sold all assets for the rebalancing calculation, revert back
@@ -367,18 +395,58 @@ class Portfolio:
 
         return (new_units, prices, exchange_history, max_diff)
 
-    def _rebalance_objective_function(self, new_asset_values,
+
+    def _rebalance_optimizer(self, target_alloc):
+        """
+        Handles the optimization algorithm for the rebalancing procedure
+
+        Args:
+            target_alloc (np.ndarray): Target allocation of Portfolio's assets (in %).
+
+        Returns:
+            (np.ndarray): Optimizer's solution, which is the total market value of each asset to purchase.
+        """
+
+        nb_assets = len(self._assets)
+        total_cash = self.cash[self._common_currency].amount
+        bound = (0.00, total_cash)
+        bounds = ((bound, ) * nb_assets)
+        constraints = [{
+            'type':
+            'ineq',
+            'fun':
+            lambda new_asset_values: total_cash - np.sum(new_asset_values)
+        }]  # Can't buy more than available cash
+
+        current_asset_values = np.array([
+            asset.market_value_in(self._common_currency)
+            for asset in self.assets.values()
+        ])
+        new_asset_values0 = target_alloc / 100. * self.value(
+            self._common_currency) - current_asset_values
+
+        solution = minimize(self._rebalance_objective,
+                            new_asset_values0,
+                            args=(current_asset_values,
+                                  target_alloc / 100.),
+                            method='SLSQP',
+                            bounds=bounds,
+                            constraints=constraints)
+
+        return solution.x
+
+    def _rebalance_objective(self, new_asset_values,
                                       current_asset_values, target_allocation):
         """
-            Objective function used in optimization problem of portfolio rebalancing.
+        Objective function used in optimization problem of portfolio rebalancing.
 
-            Args:
-                new_asset_values (np.ndarray): Market value of assets to buy.
-                current_asset_vales (np.ndarray): Portfolio's current Market values of assets (in same currency as ``new_asset_values``).
-                target_allocation: (np.ndarray): Target asset allocation (in decimal).
+        Args:
+            new_asset_values (np.ndarray): Market value of assets to buy.
+            current_asset_vales (np.ndarray): Portfolio's current Market values of assets (in same currency as ``new_asset_values``).
+            target_allocation: (np.ndarray): Target asset allocation (in decimal).
 
-            Returns:
-                float: Value of objective function.
+        Returns:
+            float: Value of objective function.
         """
 
         # total asset value
@@ -408,27 +476,25 @@ class Portfolio:
         for ticker, asset in self._assets.items():
             self.buy_asset(ticker, - asset.quantity)
 
-    def buy_asset(self, ticker, quantity):
+
+    def _combine_cash(self, currency=None):
         """
-        Buys (or sells) the specified amount of an asset.
+        Converts cash in portfolio to one currency.
 
         Args:
-            ticker (str): Ticker of asset to buy.
-            quantity (int): If positive, it is the quantity to buy. If negative, it is the quantity to sell.
-
-        Return:
-            float: Cost of transaction (in asset's own currency)
+            currency (str, optional) If specified, it is the currency to which convert all cash. If None, it is set to `_common_currency`.
         """
 
-        # @todo title - testing todo app
-        # @body body 
-        if quantity == 0:
-            return 0.00
+        if currency is None:
+            currency = self._common_currency
 
-        asset = self.assets[ticker]
-        cost = asset.buy(quantity)
-        self.add_cash(-cost, asset.currency)
-        return cost
+        cash_vals = list(self.cash.values()) # needed since cash dict might increase in size
+        for cash in cash_vals:
+            if cash.currency == currency:
+                continue
+            
+            self.exchange_currency(to_currency=currency, from_currency=cash.currency, from_amount=cash.amount)
+
 
     def _smart_exchange(self, currency_amount):
         """
@@ -529,45 +595,3 @@ class Portfolio:
                         from_cash.amount = 0.00
 
         return exchange_history
-
-    def exchange_currency(self,
-                          to_currency,
-                          from_currency,
-                          to_amount=None,
-                          from_amount=None):
-        """
-        Performs currency exchange in Portfolio.
-
-        Args:
-            to_currency (str): Currency to which to perform the exchange
-            from_currency (str): Currency from which to perform the exchange
-            to_amount (float, optional): If specified, it is the amount to which we want to convert
-            from_amount (float, optional): If specified, it is the amount from which we want to convert
-
-        Note: either the `to_amount` or `from_amount` needs to be specifed.
-        """
-
-        from_currency = from_currency.upper()
-        to_currency = to_currency.upper()
-
-        # add cash instances of both currencies to portfolio if non-existent
-        self.add_cash(0.0, from_currency)
-        self.add_cash(0.0, to_currency)
-
-        if to_amount is None and from_amount is None:
-            raise Exception(
-                "Argument `to_amount` or `from_amount` must be specified.")
-        
-        if to_amount is not None and from_amount is not None:
-            raise Exception(
-                "Please specify only `to_amount` or `from_amount`, not both.")
-        
-        if to_amount is not None:
-            from_amount = self.cash[to_currency].exchange_rate(
-                from_currency) * to_amount
-        elif from_amount is not None:
-            to_amount = self.cash[from_currency].exchange_rate(
-                to_currency) * from_amount
-
-        self.add_cash(to_amount, to_currency)
-        self.add_cash(-from_amount, from_currency)
