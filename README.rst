@@ -31,14 +31,6 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. raw:: html
 
-                    <h3 class="ui header">Run the unit tests to see if package was successfully installed:</h3>
-
-.. code-block:: bash
-
-    make test
-
-.. raw:: html
-
             </div>
         </div>
 
@@ -63,7 +55,7 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. code-block:: python
 
-    from rebalance import Portfolio, Asset
+    from rebalance import Portfolio
 
 .. raw:: html
 
@@ -105,8 +97,8 @@ A calculator which tells you how to split your investment amongst your portfolio
 .. code-block:: python
 
     # Cash in portfolio
-    cash_amounts = [500., 200.]
-    cash_currency = ["CAD", "USD"]
+    cash_amounts = [3000., 200.]
+    cash_currency = ["USD", "CAD"]
     p.easy_add_cash(amounts=cash_amounts, currencies=cash_currency)
 
 .. raw:: html
@@ -142,21 +134,24 @@ A calculator which tells you how to split your investment amongst your portfolio
 
 .. code-block:: bash
 
-     Ticker    Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation
-                        to buy         ($)                      (%)              (%)                 (%)
-    -------------------------------------------------------------------------------------------------------------
-      XBB.TO  33.43       29          969.47      CAD          17.89            19.97                20.00
-      XIC.TO  24.16       27          652.32      CAD          22.99            20.21                20.00
-        ITOT  67.35       11          740.85      USD          43.51            36.14                36.00
-        IEFA  56.19       20         1123.80      USD           9.07            19.63                20.00
-        IEMG  46.23        0            0.00      USD           6.53             4.04                 4.00
-    
-    Remaining cash: 119.63 CAD.
-    Largest discrepancy between the new and the target asset allocation is 0.37 %.
-    
-    The exchange rate from USD to CAD is 1.3577.
+      Ticker      Ask     Quantity      Amount    Currency     Old allocation   New allocation     Target allocation
+                           to buy         ($)                      (%)              (%)                 (%)
+     ---------------------------------------------------------------------------------------------------------------
+       XBB.TO    33.43       30         1002.90      CAD          17.52            19.99               20.00
+       XIC.TO    24.27       27          655.29      CAD          22.61            20.01               20.00
+         ITOT    69.38       10          693.80      USD          43.93            35.88               36.00
+         IEFA    57.65       20         1153.00      USD           9.13            19.88               20.00
+         IEMG    49.14        0            0.00      USD           6.81             4.24                4.00
 
+     Largest discrepancy between the new and the target asset allocation is 0.24 %.
 
+     Before making the above purchases, the following currency conversion is required:
+         1072.88 USD to 1458.19 CAD at a rate of 1.3591.
+
+     Remaining cash:
+         80.32 USD.
+         0.00 CAD.
+	
 .. raw:: html
 
         </div>
