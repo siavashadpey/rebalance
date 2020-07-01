@@ -1,4 +1,4 @@
-from rebalance import Portfolio, Asset
+from rebalance import Portfolio
 
 # My portfolio
 p = Portfolio()
@@ -24,5 +24,5 @@ target_asset_alloc = {
 }
 
 # rebalance
-p.selling_allowed = True  # Don't allow selling while rebalancing
+p.selling_allowed = False # Don't allow selling while rebalancing
 p.rebalance(target_asset_alloc, verbose=True)
