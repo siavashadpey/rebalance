@@ -21,11 +21,11 @@ class TestAsset(unittest.TestCase):
         ticker_info = yf.Ticker(ticker).info
 
         self.assertEqual(asset.quantity, quantity)
-        self.assertEqual(asset.price, yf.Ticker(ticker).info["ask"])
+        self.assertEqual(asset.price, yf.Ticker(ticker).info["regularMarketPrice"])
         self.assertEqual(asset.ticker, ticker)
         self.assertEqual(asset.currency, yf.Ticker(ticker).info["currency"])
         self.assertEqual(asset.market_value(),
-                         yf.Ticker(ticker).info["ask"] * quantity)
+                         yf.Ticker(ticker).info["regularMarketPrice"] * quantity)
 
     def test_interface2(self):
         """
@@ -42,7 +42,7 @@ class TestAsset(unittest.TestCase):
         self.assertEqual(asset.quantity, quantity)
 
         ticker_info = yf.Ticker(ticker).info
-        price = Price(ticker_info["ask"], currency=ticker_info["currency"])
+        price = Price(ticker_info["regularMarketPrice"], currency=ticker_info["currency"])
 
         self.assertEqual(asset.price_in("CAD"), price.price_in("CAD"))
         self.assertEqual(asset.market_value(), price.price * quantity)
@@ -61,7 +61,7 @@ class TestAsset(unittest.TestCase):
         asset = Asset(ticker, quantity)
 
         ticker_info = yf.Ticker(ticker).info
-        price = Price(ticker_info["ask"], currency=ticker_info["currency"])
+        price = Price(ticker_info["regularMarketPrice"], currency=ticker_info["currency"])
 
         to_buy = 4
         self.assertEqual(asset.cost_of(to_buy), price.price * to_buy)
