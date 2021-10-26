@@ -26,8 +26,8 @@ class Asset:
         self._quantity = quantity
         ticker_info = yf.Ticker(self._ticker).info
 
-        # we set the price to ask
-        self._price = Price(ticker_info["ask"], ticker_info["currency"])
+        # we set the price
+        self._price = Price(ticker_info["regularMarketPrice"], ticker_info["currency"])
 
     @property
     def quantity(self):
