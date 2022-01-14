@@ -3,9 +3,9 @@ Rebalance
 
 |Build status| |Coverage| |Code Factor| |Docs| 
 
-A calculator which tells you how to split your investment amongst your portfolio's assets based on your target asset allocation.
+A calculator which tells you how to split your investment amongst your portfolio's assets based on your target asset allocation.</p>
 
-You can either install the package and write a driver file as described below.
+To use it, install the package and write a driver file as described below.
 
 
 .. raw:: html
@@ -46,6 +46,8 @@ You can either install the package and write a driver file as described below.
                     <h3 class="ui header">Make a driver file:</h3>
 
                     <p> The driver file is where we create our portfolio. We specify all of its assets and the available cash we have to invest. </p>
+		    <p> Follow the steps below for a detailed description. Alternatively, you can simply modify
+		    <a href="https://github.com/siavashadpey/rebalance/blob/master/rebalance/portfolio_examply.py/">the example driver file</a>.
 
 .. code-block:: bash
 
