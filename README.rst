@@ -5,7 +5,7 @@ Rebalance
 
 A calculator which tells you how to split your investment amongst your portfolio's assets based on your target asset allocation.
 
-You can either install the package and write a driver file as described below or use the web-based calculator hosted on AWS `here <http://ec2-3-22-168-81.us-east-2.compute.amazonaws.com>`_.
+You can either install the package and write a driver file as described below.
 
 
 .. raw:: html
