@@ -3,7 +3,7 @@ Rebalance
 
 |Build status| |Coverage| |Code Factor| |Docs| 
 
-A calculator which tells you how to split your investment amongst your portfolio's assets based on your target asset allocation.</p>
+A calculator which tells you how to split your investment amongst your portfolio's assets based on your target asset allocation.
 
 To use it, install the package and write a driver file as described below.
 
